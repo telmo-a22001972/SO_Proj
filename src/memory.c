@@ -33,7 +33,9 @@ void destroy_shared_memory(char* name, void* ptr, int size){}
 
 /* Função que liberta uma zona de memória partilhada previamente reservada.
 */
-void destroy_dynamic_memory(void* ptr){}
+void destroy_dynamic_memory(void* ptr){
+    free(ptr);
+}
 
 
 /* Função que escreve uma operação num buffer de acesso aleatório. A

@@ -13,8 +13,6 @@ int main(int argc, char *argv[]) {
     //init data structures
     struct main_data* data = create_dynamic_memory(sizeof(struct
     main_data));
-
-    /*
     struct communication_buffers* buffers =
     create_dynamic_memory(sizeof(struct communication_buffers));
     buffers->main_cli = create_dynamic_memory(sizeof(struct
@@ -25,19 +23,21 @@ int main(int argc, char *argv[]) {
     rnd_access_buffer));
     buffers->srv_cli = create_dynamic_memory(sizeof(struct
     circular_buffer));
-    */
+    
 
     //execute main code
     main_args(argc, argv, data);
-    exit(0);
-    /*
     create_dynamic_memory_buffers(data);
+    
+    /*
     create_shared_memory_buffers(data, buffers);
     launch_processes(buffers, data);
     user_interaction(buffers, data);
 
     //release final memory
+    */
     destroy_dynamic_memory(data);
+    /*
     destroy_dynamic_memory(buffers->main_cli);
     destroy_dynamic_memory(buffers->cli_prx);
     destroy_dynamic_memory(buffers->prx_srv);
@@ -57,20 +57,14 @@ void main_args(int argc, char* argv[], struct main_data* data){
     if (argc != 6)
     {
         printf("Modo de execução errado.\n");
-        
+        exit(1);
     } else {
-        printf("yo\n");
-        printf("Argumento 1 = %s\n", argv[1]);
-        
-        int x  = atoi(argv[1]);
-        data->max_ops = x;
-        printf("Max ops : %d\n", data->max_ops);
-        /*
-        data->buffers_size = *argv[2];
-        data->n_clients = *argv[3];
-        data->n_proxies = *argv[4];
-        data->n_servers = *argv[5];
-        */
+        data->max_ops = atoi(argv[1]);
+        data->buffers_size = atoi(argv[2]);
+        data->n_clients = atoi(argv[3]);
+        data->n_proxies = atoi(argv[4]);
+        data->n_servers = atoi(argv[5]);
+        puts("Esketit");
        
     }
     /*
