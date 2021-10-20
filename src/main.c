@@ -7,6 +7,10 @@
 #include "process.h"
 #include "proxy.h"
 #include "server.h"
+#include <sys/types.h>
+#include <unistd.h>
+#include <string.h>
+
 
 
 int main(int argc, char *argv[]) {
@@ -27,23 +31,26 @@ int main(int argc, char *argv[]) {
 
     //execute main code
     main_args(argc, argv, data);
-    create_dynamic_memory_buffers(data);
+    void* teste = create_shared_memory("/teste",128);
     
     /*
+    create_dynamic_memory_buffers(data);
     create_shared_memory_buffers(data, buffers);
     launch_processes(buffers, data);
     user_interaction(buffers, data);
 
     //release final memory
     */
-    destroy_dynamic_memory(data);
+
     /*
+    destroy_dynamic_memory(data);
     destroy_dynamic_memory(buffers->main_cli);
     destroy_dynamic_memory(buffers->cli_prx);
     destroy_dynamic_memory(buffers->prx_srv);
     destroy_dynamic_memory(buffers->srv_cli);
     destroy_dynamic_memory(buffers);
     */
+    
 }
 
 /* Função que lê os argumentos da aplicação, nomeadamente o número

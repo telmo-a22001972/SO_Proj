@@ -7,6 +7,12 @@
 #include "proxy.h"
 #include "server.h"
 #include <stdlib.h>
+#include <unistd.h> 
+#include <sys/wait.h> 
+#include <sys/mman.h>
+#include <sys/stat.h> 
+#include <fcntl.h> 
+#include <string.h>
 
 
 /* Função que reserva uma zona de memória partilhada com tamanho indicado
@@ -14,7 +20,30 @@
 * retorna um apontador para a mesma. Pode concatenar o resultado da função
 * getuid() a name, para tornar o nome único para o processo.
 */
-void* create_shared_memory(char* name, int size){}
+void* create_shared_memory(char* name, int size){
+    
+    int *ptr;
+    int ret;
+    int fd = shm_open(name, O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
+    if (fd == -1){
+        perror(name);
+        exit(1);
+    }
+
+    ret = ftruncate(fd, sizeof(size));
+    if (ret == -1){
+        perror(name);
+        exit(2);
+    }
+
+    ptr = mmap(0, sizeof(int), PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
+    if (ptr == MAP_FAILED){
+        perror("error-mmap");
+        exit(3);
+    }
+    
+    return ptr;
+}
 
 
 /* Função que reserva uma zona de memória dinâmica com tamanho indicado
@@ -28,7 +57,21 @@ void* create_dynamic_memory(int size){
 
 /* Função que liberta uma zona de memória dinâmica previamente reservada.
 */
-void destroy_shared_memory(char* name, void* ptr, int size){}
+void destroy_shared_memory(char* name, void* ptr, int size){
+    int ret;
+
+    ret = munmap(ptr, sizeof(size));
+    if (ret == -1){
+    perror(name);
+    exit(7);
+    }
+    ret = shm_unlink(name);
+    if (ret == -1){
+    perror(name);
+    exit(8);
+    }
+    exit(0);
+}
 
 
 /* Função que liberta uma zona de memória partilhada previamente reservada.
