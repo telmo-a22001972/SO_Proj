@@ -22,6 +22,7 @@
 */
 void* create_shared_memory(char* name, int size){
     
+
     int *ptr;
     int ret;
     int fd = shm_open(name, O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
