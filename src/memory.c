@@ -87,7 +87,11 @@ void destroy_dynamic_memory(void* ptr){
 * regras de escrita em buffers de acesso aleatório. Se não houver nenhuma
 * posição livre, não escreve nada.
 */
-void write_rnd_access_buffer(struct rnd_access_buffer* buffer, int buffer_size, struct operation* op){}
+void write_rnd_access_buffer(struct rnd_access_buffer* buffer, int buffer_size, struct operation* op){
+    char *array = malloc(sizeof(buffer_size));
+    
+    buffer->enderecoArray = *array;
+}
 
 
 /* Função que escreve uma operação num buffer circular. A operação deve 
@@ -95,6 +99,7 @@ void write_rnd_access_buffer(struct rnd_access_buffer* buffer, int buffer_size, 
 * em buffers circulares. Se não houver nenhuma posição livre, não escreve
 * nada.
 */
+
 void write_circular_buffer(struct circular_buffer* buffer, int buffer_size, struct operation* op){}
 
 

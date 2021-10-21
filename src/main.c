@@ -17,24 +17,24 @@ int main(int argc, char *argv[]) {
     //init data structures
     struct main_data* data = create_dynamic_memory(sizeof(struct
     main_data));
-    struct communication_buffers* buffers =
+    struct communication_buffers* buffers = 
     create_dynamic_memory(sizeof(struct communication_buffers));
-    buffers->main_cli = create_dynamic_memory(sizeof(struct
-    rnd_access_buffer));
-    buffers->cli_prx = create_dynamic_memory(sizeof(struct
-    circular_buffer));
-    buffers->prx_srv = create_dynamic_memory(sizeof(struct
-    rnd_access_buffer));
-    buffers->srv_cli = create_dynamic_memory(sizeof(struct
-    circular_buffer));
+    buffers->main_cli = create_dynamic_memory(sizeof(struct rnd_access_buffer));
+
+    buffers->cli_prx = create_dynamic_memory(sizeof(struct circular_buffer));
+
+    buffers->prx_srv = create_dynamic_memory(sizeof(struct rnd_access_buffer));
+
+    buffers->srv_cli = create_dynamic_memory(sizeof(struct circular_buffer));
     
 
     //execute main code
     main_args(argc, argv, data);
     void* teste = create_shared_memory("/teste",128);
     
-    /*
+    
     create_dynamic_memory_buffers(data);
+    /*
     create_shared_memory_buffers(data, buffers);
     launch_processes(buffers, data);
     user_interaction(buffers, data);
@@ -74,13 +74,6 @@ void main_args(int argc, char* argv[], struct main_data* data){
         puts("Esketit");
        
     }
-    /*
-    printf("Max ops : %d\n", data->max_ops);
-    printf("buffers_size : %d\n", data->buffers_size);
-    printf("n_clients : %d\n", data->n_clients);
-    printf("n_proxies : %d\n", data->n_proxies);
-    printf("n_servers : %d\n", data->n_servers);
-    */
     
 }
 
@@ -89,7 +82,9 @@ void main_args(int argc, char* argv[], struct main_data* data){
 * main_data. Para tal, pode ser usada a função create_dynamic_memory.
 */
 
-void create_dynamic_memory_buffers(struct main_data* data){}
+void create_dynamic_memory_buffers(struct main_data* data){
+    data = create_dynamic_memory(sizeof(data));
+}
 
 /* Função que reserva a memória partilhada necessária para a execução do
 * socps. É necessário reservar memória partilhada para todos os buffers da
@@ -98,7 +93,11 @@ void create_dynamic_memory_buffers(struct main_data* data){}
 * Para tal, pode ser usada a função create_shared_memory.
 */
 
-void create_shared_memory_buffers(struct main_data* data, struct communication_buffers* buffers){}
+void create_shared_memory_buffers(struct main_data* data, struct communication_buffers* buffers){
+    //create_shared_memory vai dar return no pointer da zona de memmória partilhada criada
+    //Como é que a data e os buffers vai usar essa zona de memória?
+}
+
 
 /* Função que inicia os processos dos clientes, proxies e
 * servidores. Para tal, pode usar a função launch_process,

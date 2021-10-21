@@ -24,5 +24,6 @@ int launch_process(int process_id, int process_code, struct communication_buffer
 * Devolve o retorno do processo, se este tiver terminado normalmente.
 */
 int wait_process(int process_id){
-    
+    int pid = waitpid(process_id);
+    return pid;
 }
