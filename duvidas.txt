@@ -1,0 +1,17 @@
+main.c :
+
+void create_shared_memory_buffers(struct main_data* data, struct communication_buffers* buffers){
+    //create_shared_memory vai dar return no pointer da zona de memmória partilhada criada
+    //Como é que a data e os buffers vai usar essa zona de memória?
+    
+}
+
+memory.c e memory-private.c
+
+	ao criar as estruturas, criamos o array com um tamanho predefinido e nas função 
+	lê-mos e escrevemos só até ao tamanho que é passado como parametro.
+					ou
+	na estrutura, temos um int que fazer guardar o endereço do array. Para ser usado
+	funções read e write, mas para isso temos que ter uma função que inicialize(malloc) 
+	os arrays para cada buffer. Onde é que usamos essa função?
+
