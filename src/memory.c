@@ -87,10 +87,22 @@ void destroy_dynamic_memory(void* ptr){
 * regras de escrita em buffers de acesso aleatório. Se não houver nenhuma
 * posição livre, não escreve nada.
 */
+
 void write_rnd_access_buffer(struct rnd_access_buffer* buffer, int buffer_size, struct operation* op){
-    char *array = malloc(sizeof(buffer_size));
+    int i;
+    for (i = 0; i < sizeof(buffer->posicaoBuffer); i++)
+    {
+        if (buffer->posicaoBuffer[i] == 0)
+        {
+            buffer->buffer[i] = op;
+            buffer->posicaoBuffer[i] = 1;
+            printf("Escrito na posicao %d\n", i);
+            break;
+        }
+        
+    }
     
-    buffer->enderecoArray = *array;
+    
 }
 
 

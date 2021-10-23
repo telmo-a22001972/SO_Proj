@@ -30,10 +30,22 @@ int main(int argc, char *argv[]) {
 
     //execute main code
     main_args(argc, argv, data);
-    void* teste = create_shared_memory("/teste",128);
-    
-    
+    /*
     create_dynamic_memory_buffers(data);
+    */
+    
+    inicializar_rnd_buffer(buffers->main_cli);
+
+    struct operation variavel = {1, 'c', 0 , 1 , 1};
+    struct operation *teste = &variavel; 
+
+    write_rnd_access_buffer(buffers->main_cli, 10, teste);
+    
+    ler_bufferstruct(buffers->main_cli);
+
+    buffers->main_cli->posicaoBuffer[1] = 1;
+
+    write_rnd_access_buffer(buffers->main_cli, 10, teste);
     /*
     create_shared_memory_buffers(data, buffers);
     launch_processes(buffers, data);

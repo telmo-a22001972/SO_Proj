@@ -1,10 +1,6 @@
 #ifndef MEMORY_PRIVATE_H_GUARD
 #define MEMORY_PRIVATE_H_GUARD
-#define MAX_STRINGS 50
-#define MAX_LENGHT 258
-//Hello
-//Hello233
-
+#define MAX_OPS 50
 
 
 
@@ -17,10 +13,16 @@ struct circular_buffer {
 
 //estrutura que representa um buffer de acesso aleatório, completar pelos alunos
 struct rnd_access_buffer { 	
-    char *buffer[MAX_STRINGS][MAX_LENGHT];
-    int enderecoArray;
-    int posicaoBuffer[MAX_STRINGS];
+    struct operation *buffer[MAX_OPS];
+    int posicaoBuffer[MAX_OPS];
     
 };
+
+void inicializar_rnd_buffer(struct rnd_access_buffer* buffer);
+
+
+void ler_bufferstruct (struct rnd_access_buffer* buffer);
+
+void toStringOP(struct operation *op);
 
 #endif
