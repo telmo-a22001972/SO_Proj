@@ -5,6 +5,7 @@
 
 
 
+
 //estrutura que representa um buffer circular, completar pelos alunos
 struct circular_buffer { 
     
