@@ -112,7 +112,32 @@ void write_rnd_access_buffer(struct rnd_access_buffer* buffer, int buffer_size, 
 * nada.
 */
 
-void write_circular_buffer(struct circular_buffer* buffer, int buffer_size, struct operation* op){}
+void write_circular_buffer(struct circular_buffer* buffer, int buffer_size, struct operation* op){
+    int i;
+    /*
+    *Percorre o buffer até encontrar algum sítio onde possa escrever( tenha o valor 0 no array das posicoes)
+    *Escreve a op no buffer
+    *Vai incrementar a posição para escrever, mas se a posicao de escrever ja estiver na última
+    *Ele vai mudá-la para 0 e voltamos para o início
+    */
+    for (i = 0; i < sizeof(buffer->posicoesEscritas); i++)
+    {
+        if (buffer->posicoesEscritas[i] == 0)
+        {
+            buffer->buffer[i] = op;
+            printf("Escrito no buffer circular na posicao %d\n", i);
+
+            if (buffer->posicaoEscrever == sizeof(buffer->posicoesEscritas)-1)
+            {
+                buffer->posicaoEscrever = 0;
+            }else {
+                buffer->posicaoEscrever++;
+            }
+            break;
+        }
+    }
+    
+}
 
 
 /* Função que lê uma operação de um buffer de acesso aleatório, se houver
@@ -120,7 +145,9 @@ void write_circular_buffer(struct circular_buffer* buffer, int buffer_size, stru
 * de leitura em buffers acesso aleatório. Se não houver nenhuma operação
 * disponível, afeta op com o valor -1.
 */
-void read_rnd_access_buffer(struct rnd_access_buffer* buffer, int buffer_size, struct operation* op){}
+void read_rnd_access_buffer(struct rnd_access_buffer* buffer, int buffer_size, struct operation* op){
+
+}
 
 
 /* Função que lê uma operação de um buffer circular, se houver alguma 

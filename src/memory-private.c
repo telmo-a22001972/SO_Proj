@@ -33,3 +33,14 @@ void ler_bufferstruct (struct rnd_access_buffer* buffer){
 void toStringOP(struct operation *op){
     printf("id: %d, status: %c, client: %d, proxy: %d, server: %d\n", op->id, op->status, op->client, op->proxy, op->server);
 }
+
+void inicializar_circularbuffer(struct circular_buffer *buffer) {
+    int i;
+    buffer->posicaoEscrever = 0;
+    buffer->posicaoLer = 0;
+    for (i = 0; i < sizeof(buffer->posicoesEscritas); i++)
+    {
+        buffer->posicoesEscritas[i] = 0;
+    }
+    
+}

@@ -35,19 +35,14 @@ int main(int argc, char *argv[]) {
     */
     
     inicializar_rnd_buffer(buffers->main_cli);
+    inicializar_rnd_buffer(buffers->prx_srv);
 
-    struct operation variavel = {1, 'c', 0 , 1 , 1};
-    struct operation *teste = &variavel; 
-
-    write_rnd_access_buffer(buffers->main_cli, 10, teste);
+    inicializar_circularbuffer(buffers->cli_prx);
+    inicializar_circularbuffer(buffers->srv_cli);
     
-    ler_bufferstruct(buffers->main_cli);
-
-    buffers->main_cli->posicaoBuffer[1] = 1;
-
-    write_rnd_access_buffer(buffers->main_cli, 10, teste);
     /*
     create_shared_memory_buffers(data, buffers);
+    
     launch_processes(buffers, data);
     user_interaction(buffers, data);
 
@@ -105,10 +100,9 @@ void create_dynamic_memory_buffers(struct main_data* data){
 * Para tal, pode ser usada a função create_shared_memory.
 */
 
-void create_shared_memory_buffers(struct main_data* data, struct communication_buffers* buffers){
-    //create_shared_memory vai dar return no pointer da zona de memmória partilhada criada
+//create_shared_memory vai dar return no pointer da zona de memmória partilhada criada
     //Como é que a data e os buffers vai usar essa zona de memória?
-}
+void create_shared_memory_buffers(struct main_data* data, struct communication_buffers* buffers){}
 
 
 /* Função que inicia os processos dos clientes, proxies e
