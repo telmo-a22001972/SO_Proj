@@ -27,18 +27,32 @@ int main(int argc, char *argv[]) {
 
     buffers->srv_cli = create_dynamic_memory(sizeof(struct circular_buffer));
     
-
+    
     //execute main code
     main_args(argc, argv, data);
+    
+    //Inicializar buffers
+    inicializar_rnd_buffer(buffers->main_cli, data->buffers_size);
+    inicializar_rnd_buffer(buffers->prx_srv, data->buffers_size);
+    inicializar_circularbuffer(buffers->cli_prx, data->buffers_size);
+    inicializar_circularbuffer(buffers->srv_cli, data->buffers_size);
+
+    struct operation teste;
+    struct operation *testeprt;
+    testeprt = &teste;
+    teste.client = 0;
+    teste.id = 0;
+    teste.proxy = 0;
+    teste.server = 0;
+    teste.status = 'C';
+
+    write_rnd_access_buffer(buffers->main_cli, data->buffers_size, testeprt);
+
+    printf("%c\n", buffers->main_cli->buffer[0].status);
     /*
     create_dynamic_memory_buffers(data);
     */
     
-    inicializar_rnd_buffer(buffers->main_cli);
-    inicializar_rnd_buffer(buffers->prx_srv);
-
-    inicializar_circularbuffer(buffers->cli_prx);
-    inicializar_circularbuffer(buffers->srv_cli);
     
     /*
     create_shared_memory_buffers(data, buffers);

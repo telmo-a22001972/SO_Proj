@@ -52,7 +52,8 @@ void* create_shared_memory(char* name, int size){
 * apontador para a mesma.
 */
 void* create_dynamic_memory(int size){
-    malloc(sizeof(size));
+    int *ptr = malloc(sizeof(size));
+    return ptr;
 }
 
 
@@ -90,18 +91,16 @@ void destroy_dynamic_memory(void* ptr){
 
 void write_rnd_access_buffer(struct rnd_access_buffer* buffer, int buffer_size, struct operation* op){
     int i;
-    for (i = 0; i < sizeof(buffer->posicaoBuffer); i++)
+    for (i = 0; i < buffer_size; i++)
     {
         if (buffer->posicaoBuffer[i] == 0)
         {
-            buffer->buffer[i] = op;
+            buffer->buffer[i] = *op;
             buffer->posicaoBuffer[i] = 1;
-            printf("Escrito na posicao %d\n", i);
             break;
         }
         
     }
-    
     
 }
 
@@ -113,29 +112,14 @@ void write_rnd_access_buffer(struct rnd_access_buffer* buffer, int buffer_size, 
 */
 
 void write_circular_buffer(struct circular_buffer* buffer, int buffer_size, struct operation* op){
-    int i;
+    
     /*
     *Percorre o buffer até encontrar algum sítio onde possa escrever( tenha o valor 0 no array das posicoes)
     *Escreve a op no buffer
     *Vai incrementar a posição para escrever, mas se a posicao de escrever ja estiver na última
     *Ele vai mudá-la para 0 e voltamos para o início
     */
-    for (i = 0; i < sizeof(buffer->posicoesEscritas); i++)
-    {
-        if (buffer->posicoesEscritas[i] == 0)
-        {
-            buffer->buffer[i] = op;
-            printf("Escrito no buffer circular na posicao %d\n", i);
-
-            if (buffer->posicaoEscrever == sizeof(buffer->posicoesEscritas)-1)
-            {
-                buffer->posicaoEscrever = 0;
-            }else {
-                buffer->posicaoEscrever++;
-            }
-            break;
-        }
-    }
+   
     
 }
 
@@ -146,7 +130,18 @@ void write_circular_buffer(struct circular_buffer* buffer, int buffer_size, stru
 * disponível, afeta op com o valor -1.
 */
 void read_rnd_access_buffer(struct rnd_access_buffer* buffer, int buffer_size, struct operation* op){
-
+    int i;
+    for ( i = 0; i < buffer_size; i++)
+    {
+        if (buffer->posicaoBuffer[i] == 1)
+        {
+            /* code */
+            return;
+        }
+        
+    }
+    
+    
 }
 
 

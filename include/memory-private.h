@@ -8,25 +8,21 @@
 struct circular_buffer { 
     int posicaoLer;
     int posicaoEscrever;
-    struct operation *buffer[MAX_OPS];
-    int posicoesEscritas[MAX_OPS];
+    struct operation *buffer;
+    int *posicoesEscritas;
 
 };
 
 //estrutura que representa um buffer de acesso aleatório, completar pelos alunos
 struct rnd_access_buffer { 	
-    struct operation *buffer[MAX_OPS];
-    int posicaoBuffer[MAX_OPS];
+    struct operation *buffer;
+    int *posicaoBuffer;
     
 };
 
-void inicializar_rnd_buffer(struct rnd_access_buffer* buffer);
+void inicializar_rnd_buffer(struct rnd_access_buffer* buffer, int buffer_size);
 
+void inicializar_circularbuffer(struct circular_buffer *buffer, int buffer_size);
 
-void ler_bufferstruct (struct rnd_access_buffer* buffer);
-
-void toStringOP(struct operation *op);
-
-void inicializar_circularbuffer(struct circular_buffer *buffer);
 
 #endif
