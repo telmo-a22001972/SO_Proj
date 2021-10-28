@@ -98,13 +98,25 @@ void main_args(int argc, char* argv[], struct main_data* data){
     
 }
 
+
+
 /* Função que reserva a memória dinâmica necessária para a execução
 * do socps, nomeadamente para os arrays *_pids e *_stats da estrutura 
 * main_data. Para tal, pode ser usada a função create_dynamic_memory.
 */
 
 void create_dynamic_memory_buffers(struct main_data* data){
-    data = create_dynamic_memory(sizeof(data));
+    //Alocar memória para cada array de pids da data, do tamanho n_clientes, n_proxies, n_servers
+    data->client_pids = create_dynamic_memory(data->n_clients*sizeof(data->client_pids));
+    data->proxy_pids = create_dynamic_memory(data->n_proxies*sizeof(data->proxy_pids));
+    data->server_pids = create_dynamic_memory(data->n_servers*sizeof(data->server_pids));
+
+    //Alocar memória para cada array de status da ta, do tamanho n_clientes, n_proxies, n_servers
+    data->client_stats = create_dynamic_memory(data->n_clients*sizeof(data->client_stats));
+    data->proxy_stats = create_dynamic_memory(data->n_proxies*sizeof(data->proxy_stats));
+    data->server_stats = create_dynamic_memory(data->n_servers*sizeof(data->server_stats));
+
+    
 }
 
 /* Função que reserva a memória partilhada necessária para a execução do
@@ -114,9 +126,17 @@ void create_dynamic_memory_buffers(struct main_data* data){
 * Para tal, pode ser usada a função create_shared_memory.
 */
 
-//create_shared_memory vai dar return no pointer da zona de memmória partilhada criada
-    //Como é que a data e os buffers vai usar essa zona de memória?
-void create_shared_memory_buffers(struct main_data* data, struct communication_buffers* buffers){}
+
+void create_shared_memory_buffers(struct main_data* data, struct communication_buffers* buffers){
+
+    //Alocamos meḿoria partilhada apenas para o buffer cli_prx
+    buffers->cli_prx->buffer = create_shared_memory("/cli_prx_buffer",data->max_ops*sizeof(buffers->cli_prx->buffer));
+    buffers->cli_prx->posicoesEscritas = create_shared_memory("/cli_prx_int_arr", data->max_ops*sizeof(int*));
+    buffers->cli_prx->posicaoEscrever = create_shared_memory("/cli_prx_write_pos", sizeof(int));
+    buffers->cli_prx->posicaoLer = create_shared_memory("/cli_prx_read_pos", sizeof(int));
+
+
+}
 
 
 /* Função que inicia os processos dos clientes, proxies e

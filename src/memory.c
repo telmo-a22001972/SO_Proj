@@ -52,7 +52,7 @@ void* create_shared_memory(char* name, int size){
 * apontador para a mesma.
 */
 void* create_dynamic_memory(int size){
-    int *ptr = malloc(sizeof(size));
+    int *ptr = malloc(size);
     return ptr;
 }
 
