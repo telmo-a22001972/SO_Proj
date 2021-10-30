@@ -31,13 +31,13 @@ void* create_shared_memory(char* name, int size){
         exit(1);
     }
 
-    ret = ftruncate(fd, sizeof(size));
+    ret = ftruncate(fd,size);
     if (ret == -1){
         perror(name);
         exit(2);
     }
 
-    ptr = mmap(0, sizeof(int), PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
+    ptr = mmap(0, size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
     if (ptr == MAP_FAILED){
         perror("error-mmap");
         exit(3);
@@ -97,6 +97,7 @@ void write_rnd_access_buffer(struct rnd_access_buffer* buffer, int buffer_size, 
         {
             buffer->buffer[i] = *op;
             buffer->posicaoBuffer[i] = 1;
+            puts("escrevi");
             break;
         }
         
@@ -135,7 +136,7 @@ void read_rnd_access_buffer(struct rnd_access_buffer* buffer, int buffer_size, s
     {
         if (buffer->posicaoBuffer[i] == 1)
         {
-            /* code */
+            printf("Posicao: %d | Status: %c\n", i, buffer->buffer[i].status);
             return;
         }
         

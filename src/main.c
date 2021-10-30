@@ -31,12 +31,8 @@ int main(int argc, char *argv[]) {
     //execute main code
     main_args(argc, argv, data);
     
-    //Inicializar buffers
-    inicializar_rnd_buffer(buffers->main_cli, data->buffers_size);
-    inicializar_rnd_buffer(buffers->prx_srv, data->buffers_size);
-    inicializar_circularbuffer(buffers->cli_prx, data->buffers_size);
-    inicializar_circularbuffer(buffers->srv_cli, data->buffers_size);
-
+    create_shared_memory_buffers(data, buffers);
+    
     struct operation teste;
     struct operation *testeprt;
     testeprt = &teste;
@@ -45,13 +41,27 @@ int main(int argc, char *argv[]) {
     teste.proxy = 0;
     teste.server = 0;
     teste.status = 'C';
-
-    write_rnd_access_buffer(buffers->main_cli, data->buffers_size, testeprt);
-
-    printf("%c\n", buffers->main_cli->buffer[0].status);
-    /*
+    
+    struct operation teste2;
+    struct operation *testeprt2;
+    testeprt2 = &teste2;
+    teste2.client = 0;
+    teste2.id = 0;
+    teste2.proxy = 0;
+    teste2.server = 0;
+    teste2.status = 'S';
+    
+    buffers->cli_prx->buffer[2] = teste2;
+    //write_rnd_access_buffer(buffers->main_cli, data->buffers_size, testeprt);
+    //write_rnd_access_buffer(buffers->main_cli, data->buffers_size, testeprt2);
+    int i;
+    for (i = 0; i < data->max_ops; i++)
+    {
+        printf("Estado Pos: %d\n", buffers->cli_prx->posicoesEscritas[i]);
+    }
+    
+    //read_rnd_access_buffer(buffers->main_cli, data->max_ops, testeprt);
     create_dynamic_memory_buffers(data);
-    */
     
     
     /*
@@ -128,13 +138,15 @@ void create_dynamic_memory_buffers(struct main_data* data){
 
 
 void create_shared_memory_buffers(struct main_data* data, struct communication_buffers* buffers){
-
+   
     //Alocamos meḿoria partilhada apenas para o buffer cli_prx
     buffers->cli_prx->buffer = create_shared_memory("/cli_prx_buffer",data->max_ops*sizeof(buffers->cli_prx->buffer));
     buffers->cli_prx->posicoesEscritas = create_shared_memory("/cli_prx_int_arr", data->max_ops*sizeof(int*));
     buffers->cli_prx->posicaoEscrever = create_shared_memory("/cli_prx_write_pos", sizeof(int));
     buffers->cli_prx->posicaoLer = create_shared_memory("/cli_prx_read_pos", sizeof(int));
 
+    buffers->main_cli->buffer = create_shared_memory("/main_cli_buffer", data->max_ops*sizeof(buffers->main_cli->buffer));
+    buffers->main_cli->posicaoBuffer = create_shared_memory("/main_cli_int_arr", data->max_ops*sizeof(buffers->main_cli->posicaoBuffer));
 
 }
 

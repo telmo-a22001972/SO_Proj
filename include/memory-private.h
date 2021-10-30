@@ -6,8 +6,8 @@
 
 //estrutura que representa um buffer circular, completar pelos alunos
 struct circular_buffer { 
-    int posicaoLer;
-    int posicaoEscrever;
+    int *posicaoLer;
+    int *posicaoEscrever;
     struct operation *buffer;
     int *posicoesEscritas;
 
@@ -20,9 +20,6 @@ struct rnd_access_buffer {
     
 };
 
-void inicializar_rnd_buffer(struct rnd_access_buffer* buffer, int buffer_size);
-
-void inicializar_circularbuffer(struct circular_buffer *buffer, int buffer_size);
 
 
 #endif
