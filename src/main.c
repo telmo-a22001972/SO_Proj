@@ -33,6 +33,7 @@ int main(int argc, char *argv[]) {
     
     create_shared_memory_buffers(data, buffers);
     
+    /*                  ZONA DE TESTES
     struct operation teste;
     struct operation *testeprt;
     testeprt = &teste;
@@ -63,9 +64,10 @@ int main(int argc, char *argv[]) {
     //read_rnd_access_buffer(buffers->main_cli, data->max_ops, testeprt);
     create_dynamic_memory_buffers(data);
     
-    
+    */
+
     /*
-    create_shared_memory_buffers(data, buffers);
+    
     
     launch_processes(buffers, data);
     user_interaction(buffers, data);
