@@ -1,6 +1,6 @@
 #ifndef MEMORY_PRIVATE_H_GUARD
 #define MEMORY_PRIVATE_H_GUARD
-#define MAX_OPS 50
+
 
 
 
@@ -9,7 +9,7 @@ struct circular_buffer {
     int *posicaoLer;
     int *posicaoEscrever;
     struct operation *buffer;
-    int *posicoesEscritas;
+    //int *posicoesEscritas;
 
 };
 

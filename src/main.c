@@ -36,7 +36,7 @@ int main(int argc, char *argv[]) {
     
     create_shared_memory_buffers(data, buffers);
     
-    /*                ZONA DE TESTES
+    /*               ZONA DE TESTES
     struct operation teste;
     struct operation *testeprt;
     testeprt = &teste;
@@ -55,42 +55,47 @@ int main(int argc, char *argv[]) {
     teste2.server = 0;
     teste2.status = 'S';
     
-    write_circular_buffer(buffers->srv_cli, data->buffers_size, testeprt);
-    write_circular_buffer(buffers->srv_cli, data->buffers_size, testeprt2);
-    int i;
-    for (i = 0; i < data->max_ops; i++)
-    {
-        printf("Estado Pos: %d\n", buffers->srv_cli->posicoesEscritas[i]);
-    }
 
-    read_circular_buffer(buffers->srv_cli, data->max_ops, testeprt);
+    int pid = fork();
+    if (pid == 0)
+    {
+        write_circular_buffer(buffers->srv_cli, data->buffers_size, testeprt);
+    }
+    else{
+        int result;
+        wait(&result);
+
+        write_circular_buffer(buffers->srv_cli, data->buffers_size, testeprt2);
+        read_circular_buffer(buffers->srv_cli, data->max_ops, testeprt);
+        
+    }
     */
     
-    //Free na memoria
+    
 
     
     create_dynamic_memory_buffers(data); 
 
-    
+
+    //Destruir depois do user_interations, e antes do release final memory do stor
+    destroy_shared_memory_buffers(data,buffers);
+
 
     /*
-    
-    
     launch_processes(buffers, data);
     user_interaction(buffers, data);
 
     //release final memory
     */
-
-    /*
+    //Ja vinha do stor
+    
     destroy_dynamic_memory(data);
     destroy_dynamic_memory(buffers->main_cli);
     destroy_dynamic_memory(buffers->cli_prx);
     destroy_dynamic_memory(buffers->prx_srv);
     destroy_dynamic_memory(buffers->srv_cli);
     destroy_dynamic_memory(buffers);
-    */
-    destroy_shared_memory_buffers(data,buffers);
+    
 }
 
 /* Função que lê os argumentos da aplicação, nomeadamente o número
@@ -144,13 +149,11 @@ void create_dynamic_memory_buffers(struct main_data* data){
 * pointers, assim como para o array data->results e variável data->terminate.
 * Para tal, pode ser usada a função create_shared_memory.
 */
-
-
 void create_shared_memory_buffers(struct main_data* data, struct communication_buffers* buffers){
    
     //Alocamos meḿoria partilhada apenas para o buffer cli_prx
     buffers->cli_prx->buffer = create_shared_memory("/cli_prx_buffer",data->max_ops*sizeof(buffers->cli_prx->buffer));
-    buffers->cli_prx->posicoesEscritas = create_shared_memory("/cli_prx_int_arr", data->max_ops*sizeof(int*));
+    //buffers->cli_prx->posicoesEscritas = create_shared_memory("/cli_prx_int_arr", data->max_ops*sizeof(int*));
     buffers->cli_prx->posicaoEscrever = create_shared_memory("/cli_prx_write_pos", sizeof(buffers->cli_prx->posicaoEscrever));
     *buffers->cli_prx->posicaoEscrever = 0;
     buffers->cli_prx->posicaoLer = create_shared_memory("/cli_prx_read_pos", sizeof(buffers->cli_prx->posicaoLer));
@@ -166,7 +169,7 @@ void create_shared_memory_buffers(struct main_data* data, struct communication_b
 
     //Alocamos memória partilhada para o buffer srv_cli
     buffers->srv_cli->buffer = create_shared_memory("/srv_cli_buffer",data->max_ops*sizeof(buffers->srv_cli->buffer));
-    buffers->srv_cli->posicoesEscritas = create_shared_memory("/srv_cli_int_arr", data->max_ops*sizeof(int*));
+    //buffers->srv_cli->posicoesEscritas = create_shared_memory("/srv_cli_int_arr", data->max_ops*sizeof(int*));
     buffers->srv_cli->posicaoEscrever = create_shared_memory("/srv_cli_write_pos", sizeof(int));
     *buffers->srv_cli->posicaoEscrever = 0;
     buffers->srv_cli->posicaoLer = create_shared_memory("/srv_cli_read_pos", sizeof(int));
@@ -250,13 +253,13 @@ void destroy_shared_memory_buffers(struct main_data* data, struct communication_
 
     //Free no buffer cli_prx
     destroy_shared_memory("/cli_prx_buffer", buffers->cli_prx->buffer,data->max_ops*sizeof(buffers->cli_prx->buffer));
-    destroy_shared_memory("/cli_prx_int_arr", buffers->cli_prx->posicoesEscritas, data->max_ops*sizeof(int*));
+    //destroy_shared_memory("/cli_prx_int_arr", buffers->cli_prx->posicoesEscritas, data->max_ops*sizeof(int*));
     destroy_shared_memory("/cli_prx_write_pos", buffers->cli_prx->posicaoEscrever, sizeof(buffers->cli_prx->posicaoEscrever));
     destroy_shared_memory("/cli_prx_read_pos", buffers->cli_prx->posicaoLer, sizeof(buffers->cli_prx->posicaoLer));
 
     //Free no buffer srv_cli
     destroy_shared_memory("/srv_cli_buffer", buffers->srv_cli->buffer,data->max_ops*sizeof(buffers->cli_prx->buffer));
-    destroy_shared_memory("/srv_cli_int_arr", buffers->srv_cli->posicoesEscritas, data->max_ops*sizeof(int*));
+    //destroy_shared_memory("/srv_cli_int_arr", buffers->srv_cli->posicoesEscritas, data->max_ops*sizeof(int*));
     destroy_shared_memory("/srv_cli_write_pos", buffers->srv_cli->posicaoEscrever, sizeof(int));
     destroy_shared_memory("/srv_cli_read_pos", buffers->srv_cli->posicaoLer, sizeof(int));
 

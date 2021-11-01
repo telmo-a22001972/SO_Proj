@@ -6,6 +6,7 @@
 #include "process.h"
 #include "proxy.h"
 #include "server.h"
+#include <sys/wait.h>
 
 
 
@@ -26,6 +27,7 @@ int launch_process(int process_id, int process_code, struct communication_buffer
 * Devolve o retorno do processo, se este tiver terminado normalmente.
 */
 int wait_process(int process_id){
-    int pid = waitpid(process_id);
+    int status;
+    int pid = waitpid(process_id, &status,0);
     return pid;
 }

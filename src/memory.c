@@ -114,21 +114,13 @@ void write_rnd_access_buffer(struct rnd_access_buffer* buffer, int buffer_size, 
 void write_circular_buffer(struct circular_buffer* buffer, int buffer_size, struct operation* op){
 
     int i = *buffer->posicaoEscrever;
-    for (i; i < buffer_size; i++)
-    {
-        if (buffer->posicoesEscritas[i] == 0)
-        {
-            buffer->buffer[i] = *op;
-            buffer->posicoesEscritas[i] = 1;
-            *buffer->posicaoEscrever = *buffer->posicaoEscrever+1;
-            break;
-        }
-        
-    }
-    if (*buffer->posicaoEscrever == buffer_size)
-    {
-        *buffer->posicaoEscrever = 0;
-    }
+    
+    buffer->buffer[i] = *op;
+    //buffer->posicoesEscritas[i] = 1;
+
+    
+    
+    *buffer->posicaoEscrever = (*buffer->posicaoEscrever+1) % buffer_size;
     
 }
 
@@ -136,7 +128,7 @@ void write_circular_buffer(struct circular_buffer* buffer, int buffer_size, stru
 /* Função que lê uma operação de um buffer de acesso aleatório, se houver
 * alguma disponível para ler. A leitura deve ser feita segundo as regras
 * de leitura em buffers acesso aleatório. Se não houver nenhuma operação
-* disponível, afeta op com o valor -1.
+* disponível, afeta op->id com o valor -1.
 */
 void read_rnd_access_buffer(struct rnd_access_buffer* buffer, int buffer_size, struct operation* op){
     int i;
@@ -163,13 +155,11 @@ void read_circular_buffer(struct circular_buffer* buffer, int buffer_size, struc
 
     for (i; i < buffer_size; i++)
     {
-        if (buffer->posicoesEscritas[i] == 1)
-        {
-            printf("Posicao: %d | Status: %c\n", i, buffer->buffer[i].status);
-            *buffer->posicaoLer = *buffer->posicaoLer+1;
-            
-        }
-        
+        //ver se a op está no buffer
+        printf("Posicao: %d | Status: %c\n", i, buffer->buffer[i].status);
+        *buffer->posicaoLer = *buffer->posicaoLer+1;
+
     }
     
+    //*buffer->posicaoLer = (*buffer->posicaoLer+1) % buffer_size;
 }
