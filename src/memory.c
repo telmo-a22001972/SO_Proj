@@ -62,17 +62,16 @@ void* create_dynamic_memory(int size){
 void destroy_shared_memory(char* name, void* ptr, int size){
     int ret;
 
-    ret = munmap(ptr, sizeof(size));
+    ret = munmap(ptr, size);
     if (ret == -1){
-    perror(name);
-    exit(7);
+        perror(name);
+        exit(7);
     }
     ret = shm_unlink(name);
     if (ret == -1){
-    perror(name);
-    exit(8);
+        perror(name);
+        exit(8);
     }
-    exit(0);
 }
 
 
@@ -113,14 +112,23 @@ void write_rnd_access_buffer(struct rnd_access_buffer* buffer, int buffer_size, 
 */
 
 void write_circular_buffer(struct circular_buffer* buffer, int buffer_size, struct operation* op){
-    
-    /*
-    *Percorre o buffer até encontrar algum sítio onde possa escrever( tenha o valor 0 no array das posicoes)
-    *Escreve a op no buffer
-    *Vai incrementar a posição para escrever, mas se a posicao de escrever ja estiver na última
-    *Ele vai mudá-la para 0 e voltamos para o início
-    */
-   
+
+    int i = *buffer->posicaoEscrever;
+    for (i; i < buffer_size; i++)
+    {
+        if (buffer->posicoesEscritas[i] == 0)
+        {
+            buffer->buffer[i] = *op;
+            buffer->posicoesEscritas[i] = 1;
+            *buffer->posicaoEscrever = *buffer->posicaoEscrever+1;
+            break;
+        }
+        
+    }
+    if (*buffer->posicaoEscrever == buffer_size)
+    {
+        *buffer->posicaoEscrever = 0;
+    }
     
 }
 
@@ -138,11 +146,10 @@ void read_rnd_access_buffer(struct rnd_access_buffer* buffer, int buffer_size, s
         {
             printf("Posicao: %d | Status: %c\n", i, buffer->buffer[i].status);
             return;
+            
         }
         
     }
-    
-    
 }
 
 
@@ -151,4 +158,18 @@ void read_rnd_access_buffer(struct rnd_access_buffer* buffer, int buffer_size, s
 * leitura em buffers circular. Se não houver nenhuma operação disponível,
 * afeta op->id com o valor -1.
 */
-void read_circular_buffer(struct circular_buffer* buffer, int buffer_size, struct operation* op){}
+void read_circular_buffer(struct circular_buffer* buffer, int buffer_size, struct operation* op){
+    int i = *buffer->posicaoLer;
+
+    for (i; i < buffer_size; i++)
+    {
+        if (buffer->posicoesEscritas[i] == 1)
+        {
+            printf("Posicao: %d | Status: %c\n", i, buffer->buffer[i].status);
+            *buffer->posicaoLer = *buffer->posicaoLer+1;
+            
+        }
+        
+    }
+    
+}
