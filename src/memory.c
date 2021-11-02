@@ -22,7 +22,6 @@
 */
 void* create_shared_memory(char* name, int size){
     
-
     int *ptr;
     int ret;
     int fd = shm_open(name, O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
@@ -96,7 +95,7 @@ void write_rnd_access_buffer(struct rnd_access_buffer* buffer, int buffer_size, 
         {
             buffer->buffer[i] = *op;
             buffer->posicaoBuffer[i] = 1;
-            puts("Escrevi no random");
+            //puts("Escrevi no random");
             break;
         }
         
@@ -117,7 +116,7 @@ void write_circular_buffer(struct circular_buffer* buffer, int buffer_size, stru
     
     buffer->buffer[i] = *op;
     //buffer->posicoesEscritas[i] = 1;
-    puts("Escrevi no circular");
+    //puts("Escrevi no circular");
     
     
     *buffer->posicaoEscrever = (*buffer->posicaoEscrever+1) % buffer_size;
@@ -166,7 +165,7 @@ void read_circular_buffer(struct circular_buffer* buffer, int buffer_size, struc
     //Caso i == posicaoEscrever => não há nada escrito
     if (i == *buffer->posicaoEscrever)
     {
-        printf("Nada escrito pois posicaoLer = %d e posicaoEscrever = %d\n", *buffer->posicaoLer, *buffer->posicaoEscrever);
+        //printf("Nada escrito pois posicaoLer = %d e posicaoEscrever = %d\n", *buffer->posicaoLer, *buffer->posicaoEscrever);
         op->id = -1;
         return;
     }

@@ -29,5 +29,13 @@ int launch_process(int process_id, int process_code, struct communication_buffer
 int wait_process(int process_id){
     int status;
     int pid = waitpid(process_id, &status,0);
-    return pid;
+
+    //Terminou corretamente
+    if (WIFEXITED(status) != 0)
+    {
+        return WIFEXITED(status);
+    }
+
+    //Não terminou correamente
+    return 0;
 }

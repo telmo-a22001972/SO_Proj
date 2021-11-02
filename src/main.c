@@ -72,22 +72,15 @@ int main(int argc, char *argv[]) {
         read_rnd_access_buffer(buffers->main_cli, data->max_ops, testeprt);
         */
         //BUFFER CIRCULAR
-        read_circular_buffer(buffers->cli_prx, data->buffers_size, testeprt);
         write_circular_buffer(buffers->cli_prx, data->buffers_size, testeprt);
-        read_circular_buffer(buffers->cli_prx, data->buffers_size, testeprt);
         read_circular_buffer(buffers->cli_prx, data->buffers_size, testeprt);
         destroy_shared_memory_buffers(data,buffers);
     }
     
-    
-    
-
-    
     create_dynamic_memory_buffers(data); 
-
-
     //Destruir depois do user_interations, e antes do release final memory do stor
     //destroy_shared_memory_buffers(data,buffers);
+
 
 
     /*
