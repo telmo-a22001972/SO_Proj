@@ -96,7 +96,7 @@ void write_rnd_access_buffer(struct rnd_access_buffer* buffer, int buffer_size, 
         {
             buffer->buffer[i] = *op;
             buffer->posicaoBuffer[i] = 1;
-            puts("escrevi");
+            puts("Escrevi no random");
             break;
         }
         
@@ -117,7 +117,7 @@ void write_circular_buffer(struct circular_buffer* buffer, int buffer_size, stru
     
     buffer->buffer[i] = *op;
     //buffer->posicoesEscritas[i] = 1;
-
+    puts("Escrevi no circular");
     
     
     *buffer->posicaoEscrever = (*buffer->posicaoEscrever+1) % buffer_size;
@@ -136,12 +136,22 @@ void read_rnd_access_buffer(struct rnd_access_buffer* buffer, int buffer_size, s
     {
         if (buffer->posicaoBuffer[i] == 1)
         {
-            printf("Posicao: %d | Status: %c\n", i, buffer->buffer[i].status);
+            op->client = buffer->buffer[i].client;
+            op->id = buffer->buffer[i].id;
+            op->proxy = buffer->buffer[i].proxy;
+            op->server = buffer->buffer[i].server;
+            op->status = buffer->buffer[i].status;
+            buffer->posicaoBuffer[i] = 0;
+            printf("Posicao: %d | Status: %c | Id: %d | Client: %d | Proxy: %d | Server: %d\n", i, op->status, op->id, op->client, op->proxy, op->server);
             return;
             
         }
         
     }
+    op->id = -1;
+    /* Teste
+    *printf("Id : %d\n", op->id);
+    */
 }
 
 
@@ -152,14 +162,23 @@ void read_rnd_access_buffer(struct rnd_access_buffer* buffer, int buffer_size, s
 */
 void read_circular_buffer(struct circular_buffer* buffer, int buffer_size, struct operation* op){
     int i = *buffer->posicaoLer;
-
-    for (i; i < buffer_size; i++)
+    
+    //Caso i == posicaoEscrever => não há nada escrito
+    if (i == *buffer->posicaoEscrever)
     {
-        //ver se a op está no buffer
-        printf("Posicao: %d | Status: %c\n", i, buffer->buffer[i].status);
-        *buffer->posicaoLer = *buffer->posicaoLer+1;
-
+        printf("Nada escrito pois posicaoLer = %d e posicaoEscrever = %d\n", *buffer->posicaoLer, *buffer->posicaoEscrever);
+        op->id = -1;
+        return;
     }
     
-    //*buffer->posicaoLer = (*buffer->posicaoLer+1) % buffer_size;
+    op->client = buffer->buffer[i].client;
+    op->id = buffer->buffer[i].id;
+    op->proxy = buffer->buffer[i].proxy;
+    op->server = buffer->buffer[i].server;
+    op->status = buffer->buffer[i].status;
+    printf("Posicao: %d | Status: %c | Id: %d | Client: %d | Proxy: %d | Server: %d\n", i, op->status, op->id, op->client, op->proxy, op->server);
+    //printf("Antes de ler:\nposicaoEscrever = %d | posicaoLer = %d\n", *buffer->posicaoEscrever, *buffer->posicaoLer);
+    *buffer->posicaoLer = (*buffer->posicaoLer+1) % buffer_size;
+    //printf("Depois de ler\nposicaoEscrever = %d | posicaoLer = %d\n", *buffer->posicaoEscrever, *buffer->posicaoLer);
+   
 }
