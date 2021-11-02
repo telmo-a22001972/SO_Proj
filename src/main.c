@@ -198,7 +198,9 @@ void launch_processes(struct communication_buffers* buffers, struct main_data* d
 * help - imprime informação sobre os comandos disponiveis
 */
 
-void user_interaction(struct communication_buffers* buffers, struct main_data* data){}
+void user_interaction(struct communication_buffers* buffers, struct main_data* data){
+    
+}
 
 /* Se o limite de operações ainda não tiver sido atingido, cria uma nova
 * operação identificada pelo valor atual de op_counter, escrevendo a mesma
@@ -242,7 +244,17 @@ void write_statistics(struct main_data* data){}
 /* Função que liberta todos os buffers de memória dinâmica previamente
 * reservados na estrutura data.
 */
-void destroy_dynamic_memory_buffers(struct main_data* data){}
+void destroy_dynamic_memory_buffers(struct main_data* data){
+    free(data->client_pids);
+    free(data->proxy_pids);
+    free(data->server_pids);
+
+    //Alocar memória para cada array de status da ta, do tamanho n_clientes, n_proxies, n_servers
+    free(data->client_stats);
+    free(data->proxy_stats);
+    free(data->server_stats);
+
+}
 
 
 /* Função que liberta todos os buffers de memória partilhada previamente

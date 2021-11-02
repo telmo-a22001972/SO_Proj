@@ -17,26 +17,25 @@
 * -1 são ignoradas (op inválida) e se data->terminate for igual a 1 é porque
 * foi dada ordem de terminação do programa, portanto deve-se fazer return do
 * o número de operações processadas. Para efetuar estes passos, pode usar os
-* outros métodos auxiliares definidos em client.h. 
+* outros métodos auxiliares definidos em client.h.
 */
 int execute_client(int client_id, struct communication_buffers* buffers, struct main_data* data){
     struct operation op;
     struct operation *op_ptr = &op;
     while (1)
-    {
+    {   
         client_get_operation(op_ptr, buffers, data);
 
-        if (op_ptr->id != 1 && data->terminate == 0)
+        if (op_ptr->id != -1 && data->terminate == 0)
         {
             //Nao percebo esse counter que se tem de passar.
             client_process_operation(op_ptr, client_id, data->n_clients);
             client_send_operation(op_ptr, buffers, data);
         }
-
-
-        //O que acontece aqui pelo meio
+        /*O que acontece aqui pelo meio
+        */
         client_receive_answer(op_ptr, buffers, data);
-        if (op_ptr->id != 1 && data->terminate == 0)
+        if (op_ptr->id != -1 && data->terminate == 0)
         {
             //client_process_operation(op_ptr, client_id, /*e agora*/);
         }
@@ -70,6 +69,7 @@ void client_get_operation(struct operation* op, struct communication_buffers* bu
 * incrementando o contador de operações.
 */
 void client_process_operation(struct operation* op, int cient_id, int* counter){
+
     op->id = cient_id;
     op->status = 'C';
     *counter +=1;

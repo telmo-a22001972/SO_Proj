@@ -60,7 +60,6 @@ void* create_dynamic_memory(int size){
 */
 void destroy_shared_memory(char* name, void* ptr, int size){
     int ret;
-
     ret = munmap(ptr, size);
     if (ret == -1){
         perror(name);
@@ -97,12 +96,9 @@ void write_rnd_access_buffer(struct rnd_access_buffer* buffer, int buffer_size, 
             buffer->posicaoBuffer[i] = 1;
             //puts("Escrevi no random");
             break;
-        }
-        
-    }
-    
+        }   
+    }   
 }
-
 
 /* Função que escreve uma operação num buffer circular. A operação deve 
 * ser escrita numa posição livre do buffer, segundo as regras de escrita

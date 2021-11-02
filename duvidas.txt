@@ -1,17 +1,20 @@
-main.c :
+client.c l. 72 e main.c l.211
 
-void create_shared_memory_buffers(struct main_data* data, struct communication_buffers* buffers){
-    //create_shared_memory vai dar return no pointer da zona de memmória partilhada criada
-    //Como é que a data e os buffers vai usar essa zona de memória?
-    
-}
+Que variável é essa do op_counter e onde é que ela está?
+É usado no client.c mas noa sabemos que variável é essa.
 
-memory.c e memory-private.c
 
-	ao criar as estruturas, criamos o array com um tamanho predefinido e nas função 
-	lê-mos e escrevemos só até ao tamanho que é passado como parametro.
-					ou
-	na estrutura, temos um int que fazer guardar o endereço do array. Para ser usado
-	funções read e write, mas para isso temos que ter uma função que inicialize(malloc) 
-	os arrays para cada buffer. Onde é que usamos essa função?
+process.c 
+launch_process:
 
+é suposto fazer um fork, no pai faz o excute do cliente, e espera se que o filho acabe e no filho
+usa se o execute proxy, e volta-se a esperar pelo filho, e no filho usa-se o execute do server
+
+
+
+execute_client:
+
+escrevemos no buffer pro proxy, e logo de seguida esperamos pela resposta do server, quando esse
+pedido ainda nao foi processado pelo proxy.
+
+é suposto ser assim devido ao while(1)
