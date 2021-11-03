@@ -33,7 +33,7 @@ int main(int argc, char *argv[]) {
     
     //execute main code
     main_args(argc, argv, data);
-    
+    create_dynamic_memory_buffers(data); 
     create_shared_memory_buffers(data, buffers);
     
     //               ZONA DE TESTES
@@ -76,8 +76,7 @@ int main(int argc, char *argv[]) {
         read_circular_buffer(buffers->cli_prx, data->buffers_size, testeprt);
         destroy_shared_memory_buffers(data,buffers);
     }
-    
-    create_dynamic_memory_buffers(data); 
+
     //Destruir depois do user_interations, e antes do release final memory do stor
     //destroy_shared_memory_buffers(data,buffers);
 
@@ -164,7 +163,7 @@ void create_shared_memory_buffers(struct main_data* data, struct communication_b
     //Alocamos memória partilhada apenas no buffer main_cli
     buffers->main_cli->buffer = create_shared_memory("/main_cli_buffer", data->max_ops*sizeof(buffers->main_cli->buffer));
     buffers->main_cli->posicaoBuffer = create_shared_memory("/main_cli_int_arr", data->max_ops*sizeof(buffers->main_cli->posicaoBuffer));
-
+    
     //Alocamos memória partilhada para o buffer prx_srv
     buffers->prx_srv->buffer = create_shared_memory("/prx_srv_buffer", data->max_ops*sizeof(buffers->prx_srv->buffer));
     buffers->prx_srv->posicaoBuffer = create_shared_memory("/prx_srv_int_arr", data->max_ops*sizeof(buffers->prx_srv->posicaoBuffer));
