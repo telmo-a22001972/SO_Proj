@@ -17,25 +17,50 @@
 * número de operações processadas. Para efetuar estes passos, pode usar os
 * outros métodos auxiliares definidos em server.h.
 */
-int execute_server(int server_id, struct communication_buffers* buffers, struct main_data* data){}
+int execute_server(int server_id, struct communication_buffers* buffers, struct main_data* data){
+    struct operation op;
+    struct operation *op_ptr = &op;
 
+    server_receive_operation(op_ptr,buffers,data);
+    if (op_ptr->id != -1 && *data->terminate == 0)
+    {
+        server_process_operation(op_ptr, server_id, data->server_stats);
+        server_send_answer(op_ptr,buffers, data);
+    }
 
+    if (*data->terminate == 1)
+    {
+        return *data->server_stats;
+    }
+    
+}
+
+    
 /* Função que lê uma operação do buffer de memória partilhada entre
 * proxies e servidores. Antes de tentar ler a operação, deve verificar 
 * se data->terminate tem valor 1. Em caso afirmativo, retorna imediatamente 
 * da função.
 */
-void server_receive_operation(struct operation* op, struct communication_buffers* buffers, struct main_data* data){}
-
-
+void server_receive_operation(struct operation* op, struct communication_buffers* buffers, struct main_data* data){
+    if(*data->terminate == 1){
+        //Baza
+        return;
+    }
+    read_rnd_access_buffer(buffers->prx_srv, data->buffers_size, op);
+}
 /* Função que processa uma operação, alterando o seu campo server para o id
 * passado como argumento, alterando o estado da mesma para 'S' (served), e 
 * incrementando o contador de operações.
 */
-void server_process_operation(struct operation* op, int proxy_id, int* counter){}
-
-
+void server_process_operation(struct operation* op, int proxy_id, int* counter){
+    //Perguntar ao naercio
+    op->server = proxy_id;
+    op->status = 'S';
+    *counter+=1;
+}
 /* Função que escreve uma operação no buffer de memória partilhada entre
 * servidores e clientes.
 */
-void server_send_answer(struct operation* op, struct communication_buffers* buffers, struct main_data* data){}
+void server_send_answer(struct operation* op, struct communication_buffers* buffers, struct main_data* data){
+     write_circular_buffer(buffers->srv_cli, data->buffers_size, op);
+}

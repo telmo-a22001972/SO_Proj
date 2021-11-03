@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include "client.h"
 #include "main.h"
 #include "memory-private.h"
@@ -7,6 +8,7 @@
 #include "proxy.h"
 #include "server.h"
 #include <sys/wait.h>
+#include <unistd.h>
 
 
 
@@ -18,7 +20,54 @@
 * do processo criado.
 */
 int launch_process(int process_id, int process_code, struct communication_buffers* buffers, struct main_data* data){
+    int pid;
+    switch (process_code)
+    {
+        case 0:
+            pid = fork();
+            if (pid == -1)
+            {
+               puts("Erro fork");
+               exit(1);
+            }
+            
+            if(pid == 0){
+                execute_client(process_id, buffers,data);
+            }
+
+            
+            break;
+
+        case 1:
+            pid = fork();
+            if (pid == -1)
+            {
+               puts("Erro fork");
+               exit(1);
+            }
+            if (pid == 0)
+            {
+                execute_proxy(process_id, buffers, data);
+            }
+            break;
+        
+        case 2:
+            pid = fork();
+            if (pid == -1)
+            {
+               puts("Erro fork");
+               exit(1);
+            }
+            if (pid == 0)
+            {
+                execute_server(process_id, buffers, data);
+            }
+            break;     
+    default:
+        break;
+    }
     
+    return pid;
     
 }
 

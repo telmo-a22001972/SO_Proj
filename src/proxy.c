@@ -17,7 +17,26 @@
 * operações processadas. Para efetuar estes passos, pode usar os outros
 * métodos auxiliares definidos em proxy.h.
 */
-int execute_proxy(int proxy_id, struct communication_buffers* buffers, struct main_data* data){}
+int execute_proxy(int proxy_id, struct communication_buffers* buffers, struct main_data* data){
+    struct operation op;
+    struct operation *op_ptr = &op;
+    while(1){
+
+        proxy_receive_operation(op_ptr, buffers, data);
+        if (op_ptr->id != 1 && *data->terminate == 0)
+        {
+            proxy_process_operation(op_ptr, proxy_id, data->proxy_stats);
+            proxy_forward_operation(op_ptr,buffers, data);
+        }
+
+        if (*data->terminate = 1)
+        {
+            return *data->proxy_stats;
+        }
+        
+        
+    }
+}
 
 
 /* Função que lê uma operação do buffer de memória partilhada entre
@@ -25,17 +44,28 @@ int execute_proxy(int proxy_id, struct communication_buffers* buffers, struct ma
 * se data->terminate tem valor 1. Em caso afirmativo, retorna imediatamente 
 * da função.
 */
-void proxy_receive_operation(struct operation* op, struct communication_buffers* buffers, struct main_data* data){}
-
-
+void proxy_receive_operation(struct operation* op, struct communication_buffers* buffers, struct main_data* data){
+    if(*data->terminate == 1) {
+        //baza
+        return;
+    }
+    read_circular_buffer(buffers->cli_prx, data->buffers_size, op);
+}
 /* Função que processa uma operação, alterando o seu campo proxy para o id
 * passado como argumento, alterando o estado da mesma para 'P' (proxied), e 
 * incrementando o contador de operações.
 */
-void proxy_process_operation(struct operation* op, int server_id, int* counter){}
+void proxy_process_operation(struct operation* op, int server_id, int* counter){
+    //Perguntar ao naercio
+    op->proxy = server_id;
+    op->status = 'P';
+    *counter+=1;
+}
 
 
 /* Função que escreve uma operação no buffer de memória partilhada entre
 * proxies e servidores.
 */
-void proxy_forward_operation(struct operation* op, struct communication_buffers* buffers, struct main_data* data){}
+void proxy_forward_operation(struct operation* op, struct communication_buffers* buffers, struct main_data* data){
+    write_rnd_access_buffer(buffers->prx_srv, data->buffers_size, op);
+}

@@ -26,22 +26,28 @@ int execute_client(int client_id, struct communication_buffers* buffers, struct 
     {   
         client_get_operation(op_ptr, buffers, data);
 
-        if (op_ptr->id != -1 && data->terminate == 0)
+        if (op_ptr->id != -1 && *data->terminate == 0)
         {
             //Nao percebo esse counter que se tem de passar.
-            client_process_operation(op_ptr, client_id, data->n_clients);
+            client_process_operation(op_ptr, client_id, data->client_stats);
             client_send_operation(op_ptr, buffers, data);
         }
-        /*O que acontece aqui pelo meio
-        */
+        
+
         client_receive_answer(op_ptr, buffers, data);
-        if (op_ptr->id != -1 && data->terminate == 0)
+        if (op_ptr->id != -1 && *data->terminate == 0)
         {
-            //client_process_operation(op_ptr, client_id, /*e agora*/);
+            client_process_operation(op_ptr, client_id, data->client_stats);
         }
         
         
     }
+
+    if (*data->terminate == 1)
+    {
+        return *data->client_stats;
+    }
+    
     
 }
 
@@ -70,7 +76,7 @@ void client_get_operation(struct operation* op, struct communication_buffers* bu
 */
 void client_process_operation(struct operation* op, int cient_id, int* counter){
 
-    op->id = cient_id;
+    op->client = cient_id;
     op->status = 'C';
     *counter +=1;
 }
@@ -90,7 +96,7 @@ void client_send_operation(struct operation* op, struct communication_buffers* b
 * da função.
 */
 void client_receive_answer(struct operation* op, struct communication_buffers* buffers, struct main_data* data){
-    if (data->terminate == 1)
+    if (*data->terminate == 1)
     {
         //toca a bazar
         return;

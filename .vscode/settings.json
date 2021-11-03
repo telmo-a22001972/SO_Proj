@@ -1,6 +1,7 @@
 {
     "files.associations": {
         "typeinfo": "c",
-        "proxy.h": "c"
+        "proxy.h": "c",
+        "limits": "c"
     }
 }
