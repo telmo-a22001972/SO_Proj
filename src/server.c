@@ -21,16 +21,19 @@ int execute_server(int server_id, struct communication_buffers* buffers, struct 
     struct operation op;
     struct operation *op_ptr = &op;
 
-    server_receive_operation(op_ptr,buffers,data);
-    if (op_ptr->id != -1 && *data->terminate == 0)
+    while (1)
     {
-        server_process_operation(op_ptr, server_id, data->server_stats);
-        server_send_answer(op_ptr,buffers, data);
-    }
+        server_receive_operation(op_ptr,buffers,data);
+        if (op_ptr->id != -1 && *data->terminate == 0)
+        {
+            server_process_operation(op_ptr, server_id, data->server_stats);
+            server_send_answer(op_ptr,buffers, data);
+        }
 
-    if (*data->terminate == 1)
-    {
-        return *data->server_stats;
+        if (*data->terminate == 1)
+        {
+            return *data->server_stats;
+        }
     }
     
 }

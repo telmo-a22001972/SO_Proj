@@ -193,7 +193,7 @@ void launch_processes(struct communication_buffers *buffers, struct main_data *d
     for (i = 0; i < data->n_clients; i++)
     {
         
-        launch_process(i, 0, buffers, data);
+        data->client_pids[i]=launch_process(i, 0, buffers, data);
         
     }
 
@@ -235,13 +235,9 @@ void user_interaction(struct communication_buffers *buffers, struct main_data *d
         }
         else if (strcmp(menuOp, "read") == 0)
         {
-            if (/* condition */)
-            {
-                /* code */
-            }
             
-            struct operation op = data->results[read];
-            printf("op %d with status %c was received by client %d, forwarded by proxy %d, and served by server %d\n", read, op.status, op.client, op.proxy, op.server);
+            /*struct operation op = data->results[read];*/
+           /* printf("op %d with status %c was received by client %d, forwarded by proxy %d, and served by server %d\n", read, op.status, op.client, op.proxy, op.server);*/
         }
         else if (strcmp(menuOp, "help") == 0)
         {
@@ -325,6 +321,7 @@ void read_answer(struct main_data *data) {
 
 void stop_execution(struct main_data *data, struct communication_buffers *buffers) {
     *data->terminate = 1;
+
     wait_processes(data);
 
     write_statistics(data);
@@ -337,9 +334,7 @@ void stop_execution(struct main_data *data, struct communication_buffers *buffer
 * wait_process do process.h.
 */
 
-void wait_processes(struct main_data *data) {
-    
-}
+void wait_processes(struct main_data *data) {}
 
 /* Função que imprime as estatisticas finais do socps, nomeadamente quantas
 * operações foram processadas por cada cliente, proxy e servidor.

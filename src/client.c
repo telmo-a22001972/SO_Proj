@@ -29,7 +29,7 @@ int execute_client(int client_id, struct communication_buffers* buffers, struct 
         //da poia
         if (op_ptr->id != -1 && *data->terminate == 0)
         {
-            //Nao percebo esse counter que se tem de passar.
+            
             client_process_operation(op_ptr, client_id, data->client_stats);
             client_send_operation(op_ptr, buffers, data);
         }
@@ -41,13 +41,13 @@ int execute_client(int client_id, struct communication_buffers* buffers, struct 
             client_process_operation(op_ptr, client_id, data->client_stats);
         }
         
-        
+        if (*data->terminate == 1)
+        {
+            return *data->client_stats;
+        }
     }
 
-    if (*data->terminate == 1)
-    {
-        return *data->client_stats;
-    }
+    
     
     
 }
