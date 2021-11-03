@@ -39,53 +39,50 @@ int main(int argc, char *argv[])
     struct operation teste;
     struct operation *testeprt;
     testeprt = &teste;
-    teste.client = 0;
+    teste.client = 1;
     teste.id = 0;
-    teste.proxy = 0;
+    teste.proxy = 1;
     teste.server = 0;
     teste.status = 'C';
 
     struct operation teste2;
     struct operation *testeprt2;
     testeprt2 = &teste2;
-    teste2.client = 0;
+    teste2.client = 1;
     teste2.id = 0;
-    teste2.proxy = 0;
-    teste2.server = 0;
+    teste2.proxy = 1;
+    teste2.server = 1;
     teste2.status = 'S';
 
-    int pid = fork();
-    if (pid == 0)
-    {
-        /*BUFFER RANDOM
-        write_rnd_access_buffer(buffers->main_cli, data->buffers_size, testeprt);
-        */
-    }
-    else
-    {
-        int result;
-        wait(&result);
-        /* BUFFER RANDOM
-        write_rnd_access_buffer(buffers->main_cli, data->buffers_size, testeprt2);
-        read_rnd_access_buffer(buffers->main_cli, data->max_ops, testeprt);
-        read_rnd_access_buffer(buffers->main_cli, data->max_ops, testeprt);
-        */
-        //BUFFER CIRCULAR
-        write_circular_buffer(buffers->cli_prx, data->buffers_size, testeprt);
-        read_circular_buffer(buffers->cli_prx, data->buffers_size, testeprt);
-        destroy_shared_memory_buffers(data, buffers);
-    }
+    
 
-    //Destruir depois do user_interations, e antes do release final memory do stor
-    //destroy_shared_memory_buffers(data,buffers);
+    /* BUFFER RANDOM
+    write_rnd_access_buffer(buffers->main_cli, data->buffers_size, testeprt2);
+    read_rnd_access_buffer(buffers->main_cli, data->max_ops, testeprt);
+    read_rnd_access_buffer(buffers->main_cli, data->max_ops, testeprt);
+    */
+    //BUFFER CIRCULAR
+    write_circular_buffer(buffers->cli_prx, data->buffers_size, testeprt);
+    read_circular_buffer(buffers->cli_prx, data->buffers_size, testeprt);
+    
+    
 
+    
+    
+
+    //Problema com o destroy memory e dos forks
+    //launch_processes(buffers, data);
+    
     /*
-    launch_processes(buffers, data);
     user_interaction(buffers, data);
-
+    
     //release final memory
     */
+    
+    
+    //destroy_shared_memory_buffers(data, buffers);
     //Ja vinha do stor
+    destroy_shared_memory_buffers(data, buffers);
 
     destroy_dynamic_memory(data);
     destroy_dynamic_memory(buffers->main_cli);
@@ -93,6 +90,9 @@ int main(int argc, char *argv[])
     destroy_dynamic_memory(buffers->prx_srv);
     destroy_dynamic_memory(buffers->srv_cli);
     destroy_dynamic_memory(buffers);
+
+    
+    
 }
 
 /* Função que lê os argumentos da aplicação, nomeadamente o número
@@ -183,11 +183,14 @@ void create_shared_memory_buffers(struct main_data *data, struct communication_b
 
 void launch_processes(struct communication_buffers *buffers, struct main_data *data)
 {
+    
     //Launch clients, process_id = 0
     int i;
     for (i = 0; i < data->n_clients; i++)
     {
+        
         launch_process(i, 0, buffers, data);
+        
     }
 
     //launch proxies, procces_id = 1
@@ -215,16 +218,17 @@ void user_interaction(struct communication_buffers *buffers, struct main_data *d
 {
     char menuOp[32];
     int op_counter = 0;
+    int *op_counter_ptr = &op_counter;
     int read;
 
     do
     {
         printf("enter command:\n");
-        scanf("%s", &menuOp);
+        scanf("%s", menuOp);
         if (strcmp(menuOp, "op") == 0)
         {
             /*criar operacao*/
-            create_request(op_counter,buffers,data);
+            create_request(op_counter_ptr,buffers,data);
         }
         else if (strcmp(menuOp, "read") == 0)
         {

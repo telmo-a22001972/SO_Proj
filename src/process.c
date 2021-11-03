@@ -24,15 +24,18 @@ int launch_process(int process_id, int process_code, struct communication_buffer
     switch (process_code)
     {
         case 0:
+            
             pid = fork();
             if (pid == -1)
             {
-               puts("Erro fork");
-               exit(1);
+                puts("Erro fork");
+                exit(1);
             }
             
             if(pid == 0){
+                
                 execute_client(process_id, buffers,data);
+                
             }
 
             
