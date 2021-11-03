@@ -223,7 +223,6 @@ void user_interaction(struct communication_buffers *buffers, struct main_data *d
     char menuOp[32];
     int op_counter = 0;
     int *op_counter_ptr = &op_counter;
-    int read;
 
     do
     {
@@ -236,9 +235,13 @@ void user_interaction(struct communication_buffers *buffers, struct main_data *d
         }
         else if (strcmp(menuOp, "read") == 0)
         {
-            scanf(" %d", &read);
+            if (/* condition */)
+            {
+                /* code */
+            }
+            
             struct operation op = data->results[read];
-            printf("op %d with statuc %c was received by client %d, forwarded by proxy %d, and served by server %d\n", read, op.status, op.client, op.proxy, op.server);
+            printf("op %d with status %c was received by client %d, forwarded by proxy %d, and served by server %d\n", read, op.status, op.client, op.proxy, op.server);
         }
         else if (strcmp(menuOp, "help") == 0)
         {
@@ -284,7 +287,32 @@ void create_request(int *op_counter, struct communication_buffers *buffers, stru
 * cliente, proxy e servidor que a processaram.
 */
 
-void read_answer(struct main_data *data) {}
+void read_answer(struct main_data *data) {
+    int read , i;
+    scanf(" %d", &read);
+
+    if (read >= data->max_ops)
+    {
+        puts("op id provided is invalid!");
+        return;
+    }
+     
+    for (i = 0; i < data->max_ops ; i++)
+    {
+        if (&data->results[i] != 0) /*ver ver isto isto*/
+        {
+            /* code */
+        }
+        
+        
+    }
+    
+    
+    
+
+    struct operation op = data->results[read];
+    printf("op %d with status %c was received by client %d, forwarded by proxy %d, and served by server %d\n", read, op.status, op.client, op.proxy, op.server);
+}
 
 /* Função que termina a execução do programa socps. Deve começar por 
 * afetar a flag data->terminate com o valor 1. De seguida, e por esta
@@ -294,14 +322,23 @@ void read_answer(struct main_data *data) {}
 *reservadas. Para tal, pode usar as outras funções auxiliares do main.h.
 */
 
-void stop_execution(struct main_data *data, struct communication_buffers *buffers) {}
+void stop_execution(struct main_data *data, struct communication_buffers *buffers) {
+    *data->terminate = 1;
+    wait_processes(data);
+
+    write_statistics(data);
+
+    //destruir memória
+}
 
 /* Função que espera que todos os processos previamente iniciados terminem,
 * incluindo clientes, proxies e servidores. Para tal, pode usar a função 
 * wait_process do process.h.
 */
 
-void wait_processes(struct main_data *data) {}
+void wait_processes(struct main_data *data) {
+    
+}
 
 /* Função que imprime as estatisticas finais do socps, nomeadamente quantas
 * operações foram processadas por cada cliente, proxy e servidor.

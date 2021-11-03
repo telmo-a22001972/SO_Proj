@@ -31,9 +31,9 @@ int launch_process(int process_id, int process_code, struct communication_buffer
                 puts("Erro fork");
                 exit(1);
             }
-            
             if(pid == 0){
-                
+                int pid = getpid();
+                data->client_pids[process_id] = pid;
                 execute_client(process_id, buffers,data);
                 
             }
@@ -50,6 +50,8 @@ int launch_process(int process_id, int process_code, struct communication_buffer
             }
             if (pid == 0)
             {
+                int pid = getpid();
+                data->proxy_pids[process_id] = pid;
                 execute_proxy(process_id, buffers, data);
             }
             break;
@@ -63,6 +65,8 @@ int launch_process(int process_id, int process_code, struct communication_buffer
             }
             if (pid == 0)
             {
+                int pid = getpid();
+                data->server_pids[process_id] = pid;
                 execute_server(process_id, buffers, data);
             }
             break;     
