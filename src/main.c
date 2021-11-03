@@ -301,6 +301,7 @@ void read_answer(struct main_data *data) {
     {
         if (&data->results[i] != 0) /*ver ver isto isto*/
         {
+
             /* code */
         }
         
