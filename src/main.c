@@ -17,11 +17,11 @@
 
 int main(int argc, char *argv[])
 {
+
     //init data structures
-    struct main_data *data = create_dynamic_memory(sizeof(struct
-                                                          main_data));
-    struct communication_buffers *buffers =
-        create_dynamic_memory(sizeof(struct communication_buffers));
+    struct main_data *data = create_dynamic_memory(sizeof(struct main_data));
+    struct communication_buffers *buffers = create_dynamic_memory(sizeof(struct communication_buffers));
+
     buffers->main_cli = create_dynamic_memory(sizeof(struct rnd_access_buffer));
 
     buffers->cli_prx = create_dynamic_memory(sizeof(struct circular_buffer));
@@ -61,23 +61,26 @@ int main(int argc, char *argv[])
     read_rnd_access_buffer(buffers->main_cli, data->max_ops, testeprt);
     read_rnd_access_buffer(buffers->main_cli, data->max_ops, testeprt);
     */
-    //BUFFER CIRCULAR
+    /*BUFFER CIRCULAR
     write_circular_buffer(buffers->cli_prx, data->buffers_size, testeprt);
     read_circular_buffer(buffers->cli_prx, data->buffers_size, testeprt);
+    */
     
     
-
+    /*Teste do read x 
+    data->results[0] = teste;
+    */
     
     
 
     //Problema com o destroy memory e dos forks
     //launch_processes(buffers, data);
     
-    /*
+    
     user_interaction(buffers, data);
     
     //release final memory
-    */
+    
     
     
     //destroy_shared_memory_buffers(data, buffers);
@@ -107,6 +110,7 @@ void main_args(int argc, char *argv[], struct main_data *data)
     if (argc != 6)
     {
         printf("Modo de execução errado.\n");
+        puts("Exemplo: ./out 10 10 1 1 1");
         exit(1);
     }
     else
@@ -228,18 +232,21 @@ void user_interaction(struct communication_buffers *buffers, struct main_data *d
         if (strcmp(menuOp, "op") == 0)
         {
             /*criar operacao*/
-            create_request(op_counter_ptr,buffers,data);
+            create_request(op_counter_ptr, buffers, data);
         }
         else if (strcmp(menuOp, "read") == 0)
         {
             scanf(" %d", &read);
-            printf("%d", read);
+            struct operation op = data->results[read];
+            printf("op %d with statuc %c was received by client %d, forwarded by proxy %d, and served by server %d\n", read, op.status, op.client, op.proxy, op.server);
         }
         else if (strcmp(menuOp, "help") == 0)
         {
             printf("Available commands:\n\top - creates a new request\n\tread x - attempts to read the response to request x\n\tstop - stops the execution of this program.\n\thelp - prints these instructions.");
         }
-        else
+        else if(strcmp(menuOp, "stop") == 0){
+            //chamar a função stop_execution
+        }else
         {
             printf("Command not recognized, type \'help\' for assistance.");
         }
@@ -253,10 +260,20 @@ void user_interaction(struct communication_buffers *buffers, struct main_data *d
 */
 
 void create_request(int *op_counter, struct communication_buffers *buffers, struct main_data *data) {
-   if (*op_counter+=1 >= data->max_ops)
+    if (*op_counter+=1 >= data->max_ops)
     {
         puts("max ops has been reached!");
         return;
+    }else{
+        struct operation op;
+        struct operation *op_ptr;
+
+        op.id = *op_counter;
+        
+        write_rnd_access_buffer(buffers->main_cli, data->buffers_size, op_ptr);
+        printf("operation %d created!\n", *op_counter);
+        *op_counter+=1;
+        
     }
 
 }
