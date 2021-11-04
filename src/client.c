@@ -38,7 +38,7 @@ int execute_client(int client_id, struct communication_buffers* buffers, struct 
         client_receive_answer(op_ptr, buffers, data);
         if (op_ptr->id != -1 && *data->terminate == 0)
         {
-            client_process_operation(op_ptr, client_id, data->client_stats);
+            client_process_answer(op_ptr,data);
         }
         
         if (*data->terminate == 1)
