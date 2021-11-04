@@ -285,30 +285,26 @@ void create_request(int *op_counter, struct communication_buffers *buffers, stru
 
 void read_answer(struct main_data *data) {
     int read , i;
+    struct operation * opPtr;
+
     scanf(" %d", &read);
 
-    if (read >= data->max_ops)
+    if (read >= data->max_ops || read < 0)
     {
         puts("op id provided is invalid!");
         return;
     }
-     
-    for (i = 0; i < data->max_ops ; i++)
-    {
-        if (&data->results[i] != 0) /*ver ver isto isto*/
+    else{
+        *opPtr = data->results[read];
+        if (opPtr->status == 'S')
         {
-
-            /* code */
+           printf( "op %d with status %c was received by client %d, forwarded by proxy %d, and served by server %d!\n", opPtr->id , opPtr->status , opPtr->proxy , opPtr->server);
+        }
+        else {
+            printf("op %d is not yet available!\n");
         }
         
-        
     }
-    
-    
-    
-
-    struct operation op = data->results[read];
-    printf("op %d with status %c was received by client %d, forwarded by proxy %d, and served by server %d\n", read, op.status, op.client, op.proxy, op.server);
 }
 
 /* Função que termina a execução do programa socps. Deve começar por 
