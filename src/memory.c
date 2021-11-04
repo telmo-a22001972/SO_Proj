@@ -137,7 +137,7 @@ void read_rnd_access_buffer(struct rnd_access_buffer* buffer, int buffer_size, s
             op->server = buffer->buffer[i].server;
             op->status = buffer->buffer[i].status;
             buffer->posicaoBuffer[i] = 0;
-            printf("Posicao: %d | Status: %c | Id: %d | Client: %d | Proxy: %d | Server: %d\n", i, op->status, op->id, op->client, op->proxy, op->server);
+            //printf("Posicao: %d | Status: %c | Id: %d | Client: %d | Proxy: %d | Server: %d\n", i, op->status, op->id, op->client, op->proxy, op->server);
             return;
             
         }
@@ -171,7 +171,7 @@ void read_circular_buffer(struct circular_buffer* buffer, int buffer_size, struc
     op->proxy = buffer->buffer[i].proxy;
     op->server = buffer->buffer[i].server;
     op->status = buffer->buffer[i].status;
-    printf("Posicao: %d | Status: %c | Id: %d | Client: %d | Proxy: %d | Server: %d\n", i, op->status, op->id, op->client, op->proxy, op->server);
+    //printf("Posicao: %d | Status: %c | Id: %d | Client: %d | Proxy: %d | Server: %d\n", i, op->status, op->id, op->client, op->proxy, op->server);
     //printf("Antes de ler:\nposicaoEscrever = %d | posicaoLer = %d\n", *buffer->posicaoEscrever, *buffer->posicaoLer);
     *buffer->posicaoLer = (*buffer->posicaoLer+1) % buffer_size;
     //printf("Depois de ler\nposicaoEscrever = %d | posicaoLer = %d\n", *buffer->posicaoEscrever, *buffer->posicaoLer);

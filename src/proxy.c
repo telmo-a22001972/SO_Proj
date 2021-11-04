@@ -20,17 +20,18 @@
 int execute_proxy(int proxy_id, struct communication_buffers* buffers, struct main_data* data){
     struct operation op;
     struct operation *op_ptr = &op;
-
+    
     while(1){
 
         proxy_receive_operation(op_ptr, buffers, data);
-        if (op_ptr->id != 1 && *data->terminate == 0)
+        if (op_ptr->id != -1 && *data->terminate == 0)
         {
+            puts("O proxy leu bem");
             proxy_process_operation(op_ptr, proxy_id, data->proxy_stats);
             proxy_forward_operation(op_ptr,buffers, data);
         }
 
-        if (*data->terminate = 1)
+        if (*data->terminate == 1)
         {
             return *data->proxy_stats;
         }

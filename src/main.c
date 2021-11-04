@@ -74,7 +74,7 @@ int main(int argc, char *argv[])
     
 
     //Problema com o destroy memory e dos forks
-    //launch_processes(buffers, data);
+    launch_processes(buffers, data);
     
     
     user_interaction(buffers, data);
@@ -221,8 +221,9 @@ void launch_processes(struct communication_buffers *buffers, struct main_data *d
 void user_interaction(struct communication_buffers *buffers, struct main_data *data)
 {
     char menuOp[32];
-    int op_counter = 0;
-    int *op_counter_ptr = &op_counter;
+    
+    int *op_counter_ptr = malloc(sizeof(int));
+    *op_counter_ptr = 0;
 
     do
     {
@@ -235,7 +236,8 @@ void user_interaction(struct communication_buffers *buffers, struct main_data *d
         }
         else if (strcmp(menuOp, "read") == 0)
         {
-            
+
+            read_answer(data);
             /*struct operation op = data->results[read];*/
            /* printf("op %d with status %c was received by client %d, forwarded by proxy %d, and served by server %d\n", read, op.status, op.client, op.proxy, op.server);*/
         }
@@ -249,6 +251,9 @@ void user_interaction(struct communication_buffers *buffers, struct main_data *d
         {
             printf("Command not recognized, type \'help\' for assistance.");
         }
+
+        printf("%d",*op_counter_ptr);
+        
     } while (strcmp(menuOp, "stop"));
 }
 
@@ -259,18 +264,19 @@ void user_interaction(struct communication_buffers *buffers, struct main_data *d
 */
 
 void create_request(int *op_counter, struct communication_buffers *buffers, struct main_data *data) {
-    if (*op_counter+=1 >= data->max_ops)
+    if (*op_counter >= data->max_ops)
     {
         puts("max ops has been reached!");
         return;
     }else{
-        struct operation op;
-        struct operation *op_ptr;
+        
+        struct operation *op_ptr = malloc(sizeof(struct operation));
 
-        op.id = *op_counter;
+        op_ptr->id = *op_counter;
         
         write_rnd_access_buffer(buffers->main_cli, data->buffers_size, op_ptr);
         printf("operation %d created!\n", *op_counter);
+
         *op_counter+=1;
         
     }
@@ -285,7 +291,7 @@ void create_request(int *op_counter, struct communication_buffers *buffers, stru
 
 void read_answer(struct main_data *data) {
     int read , i;
-    struct operation * opPtr;
+    struct operation * opPtr = malloc(sizeof(struct operation));
 
     scanf(" %d", &read);
 
@@ -298,10 +304,15 @@ void read_answer(struct main_data *data) {
         *opPtr = data->results[read];
         if (opPtr->status == 'S')
         {
-           printf( "op %d with status %c was received by client %d, forwarded by proxy %d, and served by server %d!\n", opPtr->id , opPtr->status , opPtr->proxy , opPtr->server);
+           printf("op %d with status %c was received by client %d, forwarded by proxy %d, and served by server %d\n", opPtr->id , opPtr->status , opPtr->client, opPtr->proxy , opPtr->server);
         }
         else {
-            printf("op %d is not yet available!\n");
+            for (int i = 0; i < sizeof(data->results); i++)
+            {
+                printf("Status = %c\n",data->results[i].status);
+            }
+            
+            printf("op %d is not yet available!\n", read);
         }
         
     }
@@ -323,6 +334,8 @@ void stop_execution(struct main_data *data, struct communication_buffers *buffer
     write_statistics(data);
 
     //destruir memória
+    destroy_shared_memory_buffers(data, buffers);
+    destroy_dynamic_memory_buffers(data);
 }
 
 /* Função que espera que todos os processos previamente iniciados terminem,

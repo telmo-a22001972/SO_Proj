@@ -22,14 +22,14 @@
 int execute_client(int client_id, struct communication_buffers* buffers, struct main_data* data){
     struct operation op;
     struct operation *op_ptr = &op;
-    
+
     while (1)
     {   
         client_get_operation(op_ptr, buffers, data);
         //da poia
         if (op_ptr->id != -1 && *data->terminate == 0)
         {
-            
+            puts("O cliente leu do mainem;");
             client_process_operation(op_ptr, client_id, data->client_stats);
             client_send_operation(op_ptr, buffers, data);
         }
