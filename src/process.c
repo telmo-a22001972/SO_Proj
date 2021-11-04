@@ -31,7 +31,7 @@ int launch_process(int process_id, int process_code, struct communication_buffer
                 puts("Erro fork");
                 exit(1);
             }
-
+            
             if(pid == 0){
                 /*Na descrição da função diz, que o filho vai fazer
                 * exit do retorno, este retorno é o que o execute_client dá return?
@@ -50,7 +50,10 @@ int launch_process(int process_id, int process_code, struct communication_buffer
                 //exit(0);
                 
             }else{
-                int status;
+                int pid_filho = wait(NULL);
+
+                return pid_filho;
+                
                 //Receber o pid do filho por um pipe?
                 
             }
@@ -89,7 +92,8 @@ int launch_process(int process_id, int process_code, struct communication_buffer
         break;    
 
         default:
-
+            puts("ERRO LAUNCH_PROCESS");
+            return 0;
         break;
     }
     
@@ -111,12 +115,15 @@ int wait_process(int process_id){
     int status;
     int pid = waitpid(process_id, &status, 0);
     
-    //Terminou corretamente
-    if (WIFEXITED(status))
+    if (pid != -1)
     {
         return WEXITSTATUS(status);
     }
 
-    //Não terminou correamente
+    puts("erro wait");
     return 0;
+   ;
+    
+
+    
 }
