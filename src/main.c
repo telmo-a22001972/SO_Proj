@@ -66,7 +66,7 @@ int main(int argc, char *argv[])
     read_circular_buffer(buffers->cli_prx, data->buffers_size, testeprt);
     */
     
-    
+
     /*Teste do read x 
     data->results[0] = teste;
     */
@@ -266,7 +266,7 @@ void create_request(int *op_counter, struct communication_buffers *buffers, stru
         return;
     }else{
         struct operation op;
-        struct operation *op_ptr;
+        struct operation *op_ptr = &op;
 
         op.id = *op_counter;
         
