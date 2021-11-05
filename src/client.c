@@ -113,4 +113,6 @@ void client_receive_answer(struct operation* op, struct communication_buffers* b
 
 void client_process_answer(struct operation* op, struct main_data* data){
     data->results[op->id] = *op;
+    printf("Operation %d is ready to be read!\n", op->id);
+
 }

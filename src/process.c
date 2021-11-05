@@ -9,6 +9,7 @@
 #include "server.h"
 #include <sys/wait.h>
 #include <unistd.h>
+#include <string.h>
 
 
 
@@ -27,18 +28,21 @@ int launch_process(int process_id, int process_code, struct communication_buffer
     status = -1;
     if (!pid)
     {
-        //int pid = getpid();
+        
         if (process_code==0)
         {
+            
             status = execute_client(process_id,buffers,data);
         }
         else if (process_code == 1)
         {
+            
             status = execute_proxy(process_id,buffers,data);
         }
         else if(process_code == 2)
         {
-        status = execute_server(process_id,buffers,data);
+            
+            status = execute_server(process_id,buffers,data);
         }
     
         exit(status); 
@@ -46,8 +50,8 @@ int launch_process(int process_id, int process_code, struct communication_buffer
 
     if (pid != -1)
     {
-        
-        return 0;
+       
+        return pid;
     }
     perror("fork launch");
     exit(1);

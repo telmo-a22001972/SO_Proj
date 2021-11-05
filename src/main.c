@@ -194,20 +194,23 @@ void launch_processes(struct communication_buffers *buffers, struct main_data *d
     {
         
         data->client_pids[i]=launch_process(i, 0, buffers, data);
-        
+        printf("pid : %d\n", data->client_pids[i]);
     }
 
     //launch proxies, procces_id = 1
     for (i = 0; i < data->n_proxies; i++)
     {
-        launch_process(i, 1, buffers, data);
+
+        data->proxy_pids[i] = launch_process(i, 1, buffers, data);
+        printf("pid : %d\n", data->proxy_pids[i]);
     }
 
     //launch servers, process_id= 2
     for (i = 0; i < data->n_servers; i++)
     {
-
-        launch_process(i, 2, buffers, data);
+        
+        data->server_pids[i]=launch_process(i, 2, buffers, data);
+        printf("pid : %d\n", data->server_pids[i]);
     }
 }
 
@@ -246,6 +249,7 @@ void user_interaction(struct communication_buffers *buffers, struct main_data *d
         }
         else if(strcmp(menuOp, "stop") == 0){
             //chamar a função stop_execution
+            stop_execution(data, buffers);
         }else
         {
             printf("Command not recognized, type \'help\' for assistance.");
@@ -328,13 +332,15 @@ void read_answer(struct main_data *data) {
 void stop_execution(struct main_data *data, struct communication_buffers *buffers) {
     *data->terminate = 1;
 
+    //Escrever os stats no wait_processes funciona, mas no write_statistics nao
     wait_processes(data);
 
-    write_statistics(data);
+    //write_statistics(data);
 
     //destruir memória
-    destroy_shared_memory_buffers(data, buffers);
+    /*destroy_shared_memory_buffers(data, buffers);
     destroy_dynamic_memory_buffers(data);
+    */
 }
 
 /* Função que espera que todos os processos previamente iniciados terminem,
@@ -342,12 +348,53 @@ void stop_execution(struct main_data *data, struct communication_buffers *buffer
 * wait_process do process.h.
 */
 
-void wait_processes(struct main_data *data) {}
+void wait_processes(struct main_data *data) {
+    int i;
+    for (i = 0; i < data->n_clients; i++)
+    {   
+        //printf("O client %d processou %d operações\n", i,wait_process(data->client_pids[i]));
+        data->client_stats[i] = wait_process(data->client_pids[i]);
+    }
+
+    for (i = 0; i < data->n_proxies; i++)
+    {
+        //printf("O proxy %d processou %d operações\n", i,wait_process(data->proxy_pids[i]));
+        data->proxy_stats[i] = wait_process(data->proxy_stats[i]);
+    }
+
+    for (i = 0; i < data->n_servers; i++)
+    {
+        //printf("O server %d processou %d operações\n", i,wait_process(data->server_pids[i]));
+        data->proxy_stats[i] = wait_process(data->proxy_stats[i]);
+    }
+
+    return;
+    
+}
 
 /* Função que imprime as estatisticas finais do socps, nomeadamente quantas
 * operações foram processadas por cada cliente, proxy e servidor.
 */
-void write_statistics(struct main_data *data) {}
+void write_statistics(struct main_data *data) {
+    int i;
+    for (i = 0; i < data->n_clients; i++)
+    {   
+        printf("O client %d processou %d operações\n", i,wait_process(data->client_stats[i]));
+        
+    }
+
+    for (i = 0; i < data->n_proxies; i++)
+    {   
+        printf("O proxy %d processou %d operações\n", i,wait_process(data->proxy_stats[i]));
+        
+    }
+
+    for (i = 0; i < data->n_servers; i++)
+    {   
+        printf("O server %d processou %d operações\n", i,wait_process(data->server_stats[i]));
+        
+    }
+}
 
 /* Função que liberta todos os buffers de memória dinâmica previamente
 * reservados na estrutura data.
@@ -369,6 +416,8 @@ void destroy_dynamic_memory_buffers(struct main_data *data)
 */
 void destroy_shared_memory_buffers(struct main_data *data, struct communication_buffers *buffers)
 {
+
+    
     //Free no buffer main_cli
     destroy_shared_memory("/main_cli_buffer", buffers->main_cli->buffer, data->max_ops * sizeof(buffers->main_cli->buffer));
     destroy_shared_memory("/main_cli_int_arr", buffers->main_cli->posicaoBuffer, data->max_ops * sizeof(buffers->main_cli->posicaoBuffer));
