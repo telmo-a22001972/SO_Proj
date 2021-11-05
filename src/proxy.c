@@ -26,7 +26,7 @@ int execute_proxy(int proxy_id, struct communication_buffers* buffers, struct ma
         proxy_receive_operation(op_ptr, buffers, data);
         if (op_ptr->id != -1 && *data->terminate == 0)
         {
-            puts("O proxy leu bem");
+            
             proxy_process_operation(op_ptr, proxy_id, data->proxy_stats);
             proxy_forward_operation(op_ptr,buffers, data);
         }

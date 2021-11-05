@@ -20,91 +20,14 @@
 * do processo criado.
 */
 int launch_process(int process_id, int process_code, struct communication_buffers* buffers, struct main_data* data){
-<<<<<<< HEAD
-    
-    int pid;
-    switch (process_code)
-    {
-        case 0:
-            
-            pid = fork();
-            if (pid == -1)
-            {
-                puts("Erro fork");
-                exit(1);
-            }
-            
-            if(pid == 0){
-                /*Na descrição da função diz, que o filho vai fazer
-                * exit do retorno, este retorno é o que o execute_client dá return?
-                * ou seja o client_stats
-                * E então nese caso fazemos int execute_return = execute_client(...) e depois
-                * no fim damos exit(execute_return)?
-                * Então e se fizermos isto como é que sabemos que terminou corretamente?
-                * porque o normal é se terminou bem, usa-se o exit(0).
-                */
-                
-                int execute_return;
-                
-                execute_client(process_id, buffers,data);
-                execute_return = execute_client(process_id, buffers,data);
-                exit(execute_return);
-                //exit(0);
-                
-            }else{
-                int pid_filho = wait(NULL);
-
-                return pid_filho;
-                
-                //Receber o pid do filho por um pipe?
-                
-            }
-
-            
-        break;
-
-        case 1:
-            pid = fork();
-            if (pid == -1)
-            {
-               puts("Erro fork");
-               exit(1);
-            }
-            if (pid == 0)
-            {
-                
-                execute_proxy(process_id, buffers, data);
-                exit(0);
-            }
-        break;
-        
-        case 2:
-            pid = fork();
-            if (pid == -1)
-            {
-               puts("Erro fork");
-               exit(1);
-            }
-            if (pid == 0)
-            {
-                
-                execute_server(process_id, buffers, data);
-                exit(0);
-            }
-        break;    
-
-        default:
-            puts("ERRO LAUNCH_PROCESS");
-            return 0;
-        break;
-=======
     pid_t pid;
     int status;
-
+    
     pid = fork();
     status = -1;
     if (!pid)
     {
+        //int pid = getpid();
         if (process_code==0)
         {
             status = execute_client(process_id,buffers,data);
@@ -117,13 +40,13 @@ int launch_process(int process_id, int process_code, struct communication_buffer
         {
         status = execute_server(process_id,buffers,data);
         }
+    
         exit(status); 
->>>>>>> ea2ca2df1fcb4bf203255f98945455fedaa2d414
     }
 
     if (pid != -1)
     {
-        puts("O pai vai bazar");
+        
         return 0;
     }
     perror("fork launch");

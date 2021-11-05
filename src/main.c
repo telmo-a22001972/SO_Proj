@@ -236,10 +236,6 @@ void user_interaction(struct communication_buffers *buffers, struct main_data *d
         }
         else if (strcmp(menuOp, "read") == 0)
         {
-<<<<<<< HEAD
-=======
-
->>>>>>> ea2ca2df1fcb4bf203255f98945455fedaa2d414
             read_answer(data);
             /*struct operation op = data->results[read];*/
            /* printf("op %d with status %c was received by client %d, forwarded by proxy %d, and served by server %d\n", read, op.status, op.client, op.proxy, op.server);*/
@@ -255,7 +251,7 @@ void user_interaction(struct communication_buffers *buffers, struct main_data *d
             printf("Command not recognized, type \'help\' for assistance.");
         }
 
-        printf("%d",*op_counter_ptr);
+        //printf("%d",*op_counter_ptr);
         
     } while (strcmp(menuOp, "stop"));
 }
@@ -272,13 +268,8 @@ void create_request(int *op_counter, struct communication_buffers *buffers, stru
         puts("max ops has been reached!");
         return;
     }else{
-<<<<<<< HEAD
-        struct operation op;
-        struct operation *op_ptr = &op;
-=======
         
         struct operation *op_ptr = malloc(sizeof(struct operation));
->>>>>>> ea2ca2df1fcb4bf203255f98945455fedaa2d414
 
         op_ptr->id = *op_counter;
         
@@ -312,11 +303,6 @@ void read_answer(struct main_data *data) {
         *opPtr = data->results[read];
         if (opPtr->status == 'S')
         {
-<<<<<<< HEAD
-           printf( "op %d with status %c was received by client %d, forwarded by proxy %d, and served by server %d\n", opPtr->id , opPtr->status , opPtr->client, opPtr->proxy , opPtr->server);
-        }
-        else {
-=======
            printf("op %d with status %c was received by client %d, forwarded by proxy %d, and served by server %d\n", opPtr->id , opPtr->status , opPtr->client, opPtr->proxy , opPtr->server);
         }
         else {
@@ -325,7 +311,6 @@ void read_answer(struct main_data *data) {
                 printf("Status = %c\n",data->results[i].status);
             }
             
->>>>>>> ea2ca2df1fcb4bf203255f98945455fedaa2d414
             printf("op %d is not yet available!\n", read);
         }
         
