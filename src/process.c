@@ -20,6 +20,7 @@
 * do processo criado.
 */
 int launch_process(int process_id, int process_code, struct communication_buffers* buffers, struct main_data* data){
+    
     int pid;
     switch (process_code)
     {
@@ -41,7 +42,7 @@ int launch_process(int process_id, int process_code, struct communication_buffer
                 * Então e se fizermos isto como é que sabemos que terminou corretamente?
                 * porque o normal é se terminou bem, usa-se o exit(0).
                 */
-
+                
                 int execute_return;
                 
                 execute_client(process_id, buffers,data);

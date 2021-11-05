@@ -235,7 +235,7 @@ void user_interaction(struct communication_buffers *buffers, struct main_data *d
         }
         else if (strcmp(menuOp, "read") == 0)
         {
-            
+            read_answer(data);
             /*struct operation op = data->results[read];*/
            /* printf("op %d with status %c was received by client %d, forwarded by proxy %d, and served by server %d\n", read, op.status, op.client, op.proxy, op.server);*/
         }
@@ -298,10 +298,10 @@ void read_answer(struct main_data *data) {
         *opPtr = data->results[read];
         if (opPtr->status == 'S')
         {
-           printf( "op %d with status %c was received by client %d, forwarded by proxy %d, and served by server %d!\n", opPtr->id , opPtr->status , opPtr->proxy , opPtr->server);
+           printf( "op %d with status %c was received by client %d, forwarded by proxy %d, and served by server %d\n", opPtr->id , opPtr->status , opPtr->client, opPtr->proxy , opPtr->server);
         }
         else {
-            printf("op %d is not yet available!\n");
+            printf("op %d is not yet available!\n", read);
         }
         
     }
