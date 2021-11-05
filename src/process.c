@@ -20,6 +20,7 @@
 * do processo criado.
 */
 int launch_process(int process_id, int process_code, struct communication_buffers* buffers, struct main_data* data){
+<<<<<<< HEAD
     
     int pid;
     switch (process_code)
@@ -96,15 +97,37 @@ int launch_process(int process_id, int process_code, struct communication_buffer
             puts("ERRO LAUNCH_PROCESS");
             return 0;
         break;
-    }
-    
+=======
+    pid_t pid;
+    int status;
 
-    if (process_code == 0)
+    pid = fork();
+    status = -1;
+    if (!pid)
     {
-        return data->client_pids[process_id];
+        if (process_code==0)
+        {
+            status = execute_client(process_id,buffers,data);
+        }
+        else if (process_code == 1)
+        {
+            status = execute_proxy(process_id,buffers,data);
+        }
+        else if(process_code == 2)
+        {
+        status = execute_server(process_id,buffers,data);
+        }
+        exit(status); 
+>>>>>>> ea2ca2df1fcb4bf203255f98945455fedaa2d414
     }
-    
-    return pid;
+
+    if (pid != -1)
+    {
+        puts("O pai vai bazar");
+        return 0;
+    }
+    perror("fork launch");
+    exit(1);
     
 }
 
