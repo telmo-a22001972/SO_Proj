@@ -22,7 +22,12 @@ int execute_proxy(int proxy_id, struct communication_buffers* buffers, struct ma
     struct operation *op_ptr = &op;
     
     while(1){
-
+        
+        if (*data->terminate == 1)
+        {
+            return *data->proxy_stats;
+        }
+        
         proxy_receive_operation(op_ptr, buffers, data);
         if (op_ptr->id != -1 && *data->terminate == 0)
         {

@@ -225,7 +225,7 @@ void user_interaction(struct communication_buffers *buffers, struct main_data *d
 {
     char menuOp[32];
     
-    int *op_counter_ptr = malloc(sizeof(int));
+    int *op_counter_ptr = create_dynamic_memory(sizeof(int));
     *op_counter_ptr = 0;
 
     do
@@ -252,12 +252,13 @@ void user_interaction(struct communication_buffers *buffers, struct main_data *d
             stop_execution(data, buffers);
         }else
         {
-            printf("Command not recognized, type \'help\' for assistance.");
+            printf("Command not recognized, type \'help\' for assistance.\n");
         }
 
         //printf("%d",*op_counter_ptr);
         
     } while (strcmp(menuOp, "stop"));
+    destroy_dynamic_memory(op_counter_ptr);
 }
 
 /* Se o limite de operações ainda não tiver sido atingido, cria uma nova
@@ -273,7 +274,8 @@ void create_request(int *op_counter, struct communication_buffers *buffers, stru
         return;
     }else{
         
-        struct operation *op_ptr = malloc(sizeof(struct operation));
+        //MUDEI AQUI: TIREI O MALLOC
+        struct operation *op_ptr;
 
         op_ptr->id = *op_counter;
         
@@ -352,20 +354,20 @@ void wait_processes(struct main_data *data) {
     int i;
     for (i = 0; i < data->n_clients; i++)
     {   
-        //printf("O client %d processou %d operações\n", i,wait_process(data->client_pids[i]));
-        data->client_stats[i] = wait_process(data->client_pids[i]);
+        printf("O client %d processou %d operações\n", i,wait_process(data->client_pids[i]));
+        //data->client_stats[i] = wait_process(data->client_pids[i]);
     }
 
     for (i = 0; i < data->n_proxies; i++)
     {
-        //printf("O proxy %d processou %d operações\n", i,wait_process(data->proxy_pids[i]));
-        data->proxy_stats[i] = wait_process(data->proxy_stats[i]);
+        printf("O proxy %d processou %d operações\n", i,wait_process(data->proxy_pids[i]));
+        //data->proxy_stats[i] = wait_process(data->proxy_stats[i]);
     }
 
     for (i = 0; i < data->n_servers; i++)
     {
-        //printf("O server %d processou %d operações\n", i,wait_process(data->server_pids[i]));
-        data->proxy_stats[i] = wait_process(data->proxy_stats[i]);
+        printf("O server %d processou %d operações\n", i,wait_process(data->server_pids[i]));
+        //data->proxy_stats[i] = wait_process(data->proxy_stats[i]);
     }
 
     return;
@@ -382,18 +384,21 @@ void write_statistics(struct main_data *data) {
         printf("O client %d processou %d operações\n", i,wait_process(data->client_stats[i]));
         
     }
+    puts("\n");
 
     for (i = 0; i < data->n_proxies; i++)
     {   
         printf("O proxy %d processou %d operações\n", i,wait_process(data->proxy_stats[i]));
         
     }
+    puts("\n");
 
     for (i = 0; i < data->n_servers; i++)
     {   
         printf("O server %d processou %d operações\n", i,wait_process(data->server_stats[i]));
         
-    }
+    
+    puts("\n");}
 }
 
 /* Função que liberta todos os buffers de memória dinâmica previamente

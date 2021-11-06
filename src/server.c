@@ -23,6 +23,11 @@ int execute_server(int server_id, struct communication_buffers* buffers, struct 
 
     while (1)
     {
+        if (*data->terminate == 1)
+        {
+            return *data->server_stats;
+        }
+        
         server_receive_operation(op_ptr,buffers,data);
         if (op_ptr->id != -1 && *data->terminate == 0)
         {
@@ -65,5 +70,5 @@ void server_process_operation(struct operation* op, int proxy_id, int* counter){
 * servidores e clientes.
 */
 void server_send_answer(struct operation* op, struct communication_buffers* buffers, struct main_data* data){
-     write_circular_buffer(buffers->srv_cli, data->buffers_size, op);
+    write_circular_buffer(buffers->srv_cli, data->buffers_size, op);
 }

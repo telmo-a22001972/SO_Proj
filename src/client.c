@@ -25,6 +25,11 @@ int execute_client(int client_id, struct communication_buffers* buffers, struct 
 
     while (1)
     {   
+        if (*data->terminate == 1)
+        {
+            return *data->client_stats;
+        }
+        
         client_get_operation(op_ptr, buffers, data);
         //da poia
         if (op_ptr->id != -1 && *data->terminate == 0)
