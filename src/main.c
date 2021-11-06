@@ -34,67 +34,11 @@ int main(int argc, char *argv[])
     main_args(argc, argv, data);
     create_dynamic_memory_buffers(data);
     create_shared_memory_buffers(data, buffers);
-
-    //               ZONA DE TESTES
-    struct operation teste;
-    struct operation *testeprt;
-    testeprt = &teste;
-    teste.client = 1;
-    teste.id = 0;
-    teste.proxy = 1;
-    teste.server = 0;
-    teste.status = 'C';
-
-    struct operation teste2;
-    struct operation *testeprt2;
-    testeprt2 = &teste2;
-    teste2.client = 1;
-    teste2.id = 0;
-    teste2.proxy = 1;
-    teste2.server = 1;
-    teste2.status = 'S';
-
     
-
-    /* BUFFER RANDOM
-    write_rnd_access_buffer(buffers->main_cli, data->buffers_size, testeprt2);
-    read_rnd_access_buffer(buffers->main_cli, data->max_ops, testeprt);
-    read_rnd_access_buffer(buffers->main_cli, data->max_ops, testeprt);
-    */
-    /*BUFFER CIRCULAR
-    write_circular_buffer(buffers->cli_prx, data->buffers_size, testeprt);
-    read_circular_buffer(buffers->cli_prx, data->buffers_size, testeprt);
-    */
-    
-
-    /*Teste do read x 
-    data->results[0] = teste;
-    */
-    
-    
-
-    //Problema com o destroy memory e dos forks
     launch_processes(buffers, data);
     
     
     user_interaction(buffers, data);
-    
-    //release final memory
-    
-    
-    
-    //destroy_shared_memory_buffers(data, buffers);
-    //Ja vinha do stor
-    destroy_shared_memory_buffers(data, buffers);
-
-    destroy_dynamic_memory(data);
-    destroy_dynamic_memory(buffers->main_cli);
-    destroy_dynamic_memory(buffers->cli_prx);
-    destroy_dynamic_memory(buffers->prx_srv);
-    destroy_dynamic_memory(buffers->srv_cli);
-    destroy_dynamic_memory(buffers);
-
-    
     
 }
 
@@ -240,8 +184,6 @@ void user_interaction(struct communication_buffers *buffers, struct main_data *d
         else if (strcmp(menuOp, "read") == 0)
         {
             read_answer(data);
-            /*struct operation op = data->results[read];*/
-           /* printf("op %d with status %c was received by client %d, forwarded by proxy %d, and served by server %d\n", read, op.status, op.client, op.proxy, op.server);*/
         }
         else if (strcmp(menuOp, "help") == 0)
         {
@@ -255,7 +197,6 @@ void user_interaction(struct communication_buffers *buffers, struct main_data *d
             printf("Command not recognized, type \'help\' for assistance.\n");
         }
 
-        //printf("%d",*op_counter_ptr);
         
     } while (strcmp(menuOp, "stop"));
     destroy_dynamic_memory(op_counter_ptr);
@@ -274,7 +215,6 @@ void create_request(int *op_counter, struct communication_buffers *buffers, stru
         return;
     }else{
         
-        //MUDEI AQUI: TIREI O MALLOC
         struct operation *op_ptr;
 
         op_ptr->id = *op_counter;
@@ -335,15 +275,19 @@ void read_answer(struct main_data *data) {
 void stop_execution(struct main_data *data, struct communication_buffers *buffers) {
     *data->terminate = 1;
 
-    //Escrever os stats no wait_processes funciona, mas no write_statistics nao
     wait_processes(data);
 
     write_statistics(data);
 
-    //destruir memória
-    /*destroy_shared_memory_buffers(data, buffers);
+    /*destruir memória*/
+    destroy_shared_memory_buffers(data, buffers);
     destroy_dynamic_memory_buffers(data);
-    */
+    destroy_dynamic_memory(data);
+    destroy_dynamic_memory(buffers->main_cli);
+    destroy_dynamic_memory(buffers->cli_prx);
+    destroy_dynamic_memory(buffers->prx_srv);
+    destroy_dynamic_memory(buffers->srv_cli);
+    destroy_dynamic_memory(buffers);
 }
 
 /* Função que espera que todos os processos previamente iniciados terminem,
@@ -355,26 +299,18 @@ void wait_processes(struct main_data *data) {
     int i;
     for (i = 0; i < data->n_clients; i++)
     {   
-        //int stats = wait_process(data->client_pids[i]);
-        //printf("O client %d processou %d operações\n", i, stats/*wait_process(data->client_pids[i])*/);
         data->client_stats[i] = wait_process(data->client_pids[i]);
-        //printf("O client %d processou %d operações\n", i, data->client_stats[i]);
     }
 
     for (i = 0; i < data->n_proxies; i++)
     {
-        //int stats = wait_process(data->proxy_pids[i]);
-        //printf("O proxy %d processou %d operações\n", i, stats/*wait_process(data->proxy_pids[i])*/);
         data->proxy_stats[i] = wait_process(data->proxy_pids[i]);
-       //printf("O proxy %d processou %d operações\n", i, data->proxy_stats[i]);
     }
 
     for (i = 0; i < data->n_servers; i++)
     {
-        //int stats = wait_process(data->server_pids[i]);
-        //printf("O server %d processou %d operações\n", i, stats/*wait_process(data->server_pids[i])*/);
+
         data->server_stats[i] = wait_process(data->server_pids[i]);
-        //printf("O server %d processou %d operações\n", i, data->server_stats[i]);
     }
 
     return;
@@ -402,9 +338,6 @@ void write_statistics(struct main_data *data) {
     for (i = 0; i < data->n_servers; i++)
     {   
         printf("O server %d processou %d operações\n", i, data->server_stats[i]);
-        
-    
-    
     }
 }
 
@@ -417,7 +350,6 @@ void destroy_dynamic_memory_buffers(struct main_data *data)
     free(data->proxy_pids);
     free(data->server_pids);
 
-    //Alocar memória para cada array de status da ta, do tamanho n_clientes, n_proxies, n_servers
     free(data->client_stats);
     free(data->proxy_stats);
     free(data->server_stats);
@@ -436,13 +368,11 @@ void destroy_shared_memory_buffers(struct main_data *data, struct communication_
 
     //Free no buffer cli_prx
     destroy_shared_memory("/cli_prx_buffer", buffers->cli_prx->buffer, data->max_ops * sizeof(buffers->cli_prx->buffer));
-    //destroy_shared_memory("/cli_prx_int_arr", buffers->cli_prx->posicoesEscritas, data->max_ops*sizeof(int*));
     destroy_shared_memory("/cli_prx_write_pos", buffers->cli_prx->posicaoEscrever, sizeof(buffers->cli_prx->posicaoEscrever));
     destroy_shared_memory("/cli_prx_read_pos", buffers->cli_prx->posicaoLer, sizeof(buffers->cli_prx->posicaoLer));
 
     //Free no buffer srv_cli
     destroy_shared_memory("/srv_cli_buffer", buffers->srv_cli->buffer, data->max_ops * sizeof(buffers->cli_prx->buffer));
-    //destroy_shared_memory("/srv_cli_int_arr", buffers->srv_cli->posicoesEscritas, data->max_ops*sizeof(int*));
     destroy_shared_memory("/srv_cli_write_pos", buffers->srv_cli->posicaoEscrever, sizeof(int));
     destroy_shared_memory("/srv_cli_read_pos", buffers->srv_cli->posicaoLer, sizeof(int));
 

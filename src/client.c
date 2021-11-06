@@ -31,7 +31,7 @@ int execute_client(int client_id, struct communication_buffers* buffers, struct 
         }
         
         client_get_operation(op_ptr, buffers, data);
-        //da poia
+
         if (op_ptr->id != -1 && *data->terminate == 0)
         {
             
@@ -66,7 +66,6 @@ int execute_client(int client_id, struct communication_buffers* buffers, struct 
 void client_get_operation(struct operation* op, struct communication_buffers* buffers, struct main_data* data){
     if (*data->terminate == 1)
     {
-        //Toca a desligar
         return;
     }
     else {
@@ -104,7 +103,6 @@ void client_send_operation(struct operation* op, struct communication_buffers* b
 void client_receive_answer(struct operation* op, struct communication_buffers* buffers, struct main_data* data){
     if (*data->terminate == 1)
     {
-        //toca a bazar
         return;
     }
     
