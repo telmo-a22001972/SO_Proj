@@ -194,7 +194,7 @@ void launch_processes(struct communication_buffers *buffers, struct main_data *d
     {
         
         data->client_pids[i]=launch_process(i, 0, buffers, data);
-        printf("pid : %d\n", data->client_pids[i]);
+        
     }
 
     //launch proxies, procces_id = 1
@@ -202,7 +202,7 @@ void launch_processes(struct communication_buffers *buffers, struct main_data *d
     {
 
         data->proxy_pids[i] = launch_process(i, 1, buffers, data);
-        printf("pid : %d\n", data->proxy_pids[i]);
+        
     }
 
     //launch servers, process_id= 2
@@ -210,7 +210,7 @@ void launch_processes(struct communication_buffers *buffers, struct main_data *d
     {
         
         data->server_pids[i]=launch_process(i, 2, buffers, data);
-        printf("pid : %d\n", data->server_pids[i]);
+        
     }
 }
 
@@ -320,7 +320,8 @@ void read_answer(struct main_data *data) {
             printf("op %d is not yet available!\n", read);
         }
         
-    }
+    } 
+    destroy_dynamic_memory(opPtr);
 }
 
 /* Função que termina a execução do programa socps. Deve começar por 
