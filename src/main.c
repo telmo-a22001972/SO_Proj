@@ -337,7 +337,7 @@ void stop_execution(struct main_data *data, struct communication_buffers *buffer
     //Escrever os stats no wait_processes funciona, mas no write_statistics nao
     wait_processes(data);
 
-    //write_statistics(data);
+    write_statistics(data);
 
     //destruir memória
     /*destroy_shared_memory_buffers(data, buffers);
@@ -354,20 +354,26 @@ void wait_processes(struct main_data *data) {
     int i;
     for (i = 0; i < data->n_clients; i++)
     {   
-        printf("O client %d processou %d operações\n", i,wait_process(data->client_pids[i]));
-        //data->client_stats[i] = wait_process(data->client_pids[i]);
+        //int stats = wait_process(data->client_pids[i]);
+        //printf("O client %d processou %d operações\n", i, stats/*wait_process(data->client_pids[i])*/);
+        data->client_stats[i] = wait_process(data->client_pids[i]);
+        //printf("O client %d processou %d operações\n", i, data->client_stats[i]);
     }
 
     for (i = 0; i < data->n_proxies; i++)
     {
-        printf("O proxy %d processou %d operações\n", i,wait_process(data->proxy_pids[i]));
-        //data->proxy_stats[i] = wait_process(data->proxy_stats[i]);
+        //int stats = wait_process(data->proxy_pids[i]);
+        //printf("O proxy %d processou %d operações\n", i, stats/*wait_process(data->proxy_pids[i])*/);
+        data->proxy_stats[i] = wait_process(data->proxy_pids[i]);
+       //printf("O proxy %d processou %d operações\n", i, data->proxy_stats[i]);
     }
 
     for (i = 0; i < data->n_servers; i++)
     {
-        printf("O server %d processou %d operações\n", i,wait_process(data->server_pids[i]));
-        //data->proxy_stats[i] = wait_process(data->proxy_stats[i]);
+        //int stats = wait_process(data->server_pids[i]);
+        //printf("O server %d processou %d operações\n", i, stats/*wait_process(data->server_pids[i])*/);
+        data->server_stats[i] = wait_process(data->server_pids[i]);
+        //printf("O server %d processou %d operações\n", i, data->server_stats[i]);
     }
 
     return;
@@ -381,24 +387,24 @@ void write_statistics(struct main_data *data) {
     int i;
     for (i = 0; i < data->n_clients; i++)
     {   
-        printf("O client %d processou %d operações\n", i,wait_process(data->client_stats[i]));
+        printf("O client %d processou %d operações\n", i, data->client_stats[i]);
         
     }
-    puts("\n");
 
     for (i = 0; i < data->n_proxies; i++)
     {   
-        printf("O proxy %d processou %d operações\n", i,wait_process(data->proxy_stats[i]));
+        printf("O proxy %d processou %d operações\n", i, data->proxy_stats[i]);
         
     }
-    puts("\n");
+    
 
     for (i = 0; i < data->n_servers; i++)
     {   
-        printf("O server %d processou %d operações\n", i,wait_process(data->server_stats[i]));
+        printf("O server %d processou %d operações\n", i, data->server_stats[i]);
         
     
-    puts("\n");}
+    
+    }
 }
 
 /* Função que liberta todos os buffers de memória dinâmica previamente

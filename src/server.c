@@ -60,9 +60,9 @@ void server_receive_operation(struct operation* op, struct communication_buffers
 * passado como argumento, alterando o estado da mesma para 'S' (served), e 
 * incrementando o contador de operações.
 */
-void server_process_operation(struct operation* op, int proxy_id, int* counter){
+void server_process_operation(struct operation* op, int server_id, int* counter){
     //Perguntar ao naercio
-    op->server = proxy_id;
+    op->server = server_id;
     op->status = 'S';
     *counter+=1;
 }
