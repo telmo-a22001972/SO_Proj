@@ -53,7 +53,6 @@ int execute_proxy(int proxy_id, struct communication_buffers* buffers, struct ma
 */
 void proxy_receive_operation(struct operation* op, struct communication_buffers* buffers, struct main_data* data){
     if(*data->terminate == 1) {
-        //baza
         return;
     }
     read_circular_buffer(buffers->cli_prx, data->buffers_size, op);
@@ -63,7 +62,6 @@ void proxy_receive_operation(struct operation* op, struct communication_buffers*
 * incrementando o contador de operações.
 */
 void proxy_process_operation(struct operation* op, int server_id, int* counter){
-    //Perguntar ao naercio
     op->proxy = server_id;
     op->status = 'P';
     *counter+=1;

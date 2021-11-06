@@ -51,7 +51,6 @@ int execute_server(int server_id, struct communication_buffers* buffers, struct 
 */
 void server_receive_operation(struct operation* op, struct communication_buffers* buffers, struct main_data* data){
     if(*data->terminate == 1){
-        //Baza
         return;
     }
     read_rnd_access_buffer(buffers->prx_srv, data->buffers_size, op);
@@ -61,7 +60,6 @@ void server_receive_operation(struct operation* op, struct communication_buffers
 * incrementando o contador de operações.
 */
 void server_process_operation(struct operation* op, int server_id, int* counter){
-    //Perguntar ao naercio
     op->server = server_id;
     op->status = 'S';
     *counter+=1;
