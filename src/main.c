@@ -16,6 +16,7 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <time.h>
+#include "log.h"
 
 
 int main(int argc, char *argv[])
@@ -23,6 +24,8 @@ int main(int argc, char *argv[])
 
     //init data structures
     struct main_data *data = create_dynamic_memory(sizeof(struct main_data));
+    data->log_filename = "log.txt";
+
     struct communication_buffers *buffers = create_dynamic_memory(sizeof(struct communication_buffers));
     struct semaphores *sems;
 
@@ -204,6 +207,7 @@ void user_interaction(struct communication_buffers* buffers, struct main_data* d
         }
         else if(strcmp(menuOp, "stop") == 0){
             //chamar a função stop_execution
+            registerLog(data, 2, 0);
             stop_execution(data, buffers,sems);
         }else
         {
@@ -223,6 +227,9 @@ void user_interaction(struct communication_buffers* buffers, struct main_data* d
 */
 
 void create_request(int* op_counter, struct communication_buffers* buffers, struct main_data* data, struct semaphores* sems){
+    
+    registerLog(data, 0, 0);
+    
     if (*op_counter >= data->max_ops)
     {
         puts("max ops has been reached!");
@@ -254,7 +261,7 @@ void read_answer(struct main_data* data, struct semaphores* sems) {
     struct operation * opPtr = malloc(sizeof(struct operation));
 
     scanf(" %d", &read);
-    
+    registerLog(data, 1, read);
     if (read >= data->max_ops || read < 0)
     {
         puts("op id provided is invalid!");
@@ -264,7 +271,7 @@ void read_answer(struct main_data* data, struct semaphores* sems) {
         *opPtr = data->results[read];
         if (opPtr->status == 'S')
         {
-           printf("op %d with status %c was received by client %d, forwarded by proxy %d, and served by server %d\n", opPtr->id , opPtr->status , opPtr->client, opPtr->proxy , opPtr->server);
+            printf("op %d with status %c was received by client %d, forwarded by proxy %d, and served by server %d\n", opPtr->id , opPtr->status , opPtr->client, opPtr->proxy , opPtr->server);
         }
         else {
             

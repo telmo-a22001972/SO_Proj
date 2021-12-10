@@ -22,6 +22,7 @@ struct main_data {
 	int* server_stats;	//nº de operações respondidas por cada servidor
 	
 	struct operation* results;	//array com histórico de ops executadas
+	char* log_filename;			//nome do ficheiro de log
 	
 	int* terminate; //flag booleana, valor 1 indica que sovac deve terminar a sua execução
 };
