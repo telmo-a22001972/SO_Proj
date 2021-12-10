@@ -23,7 +23,7 @@ int main(int argc, char *argv[])
     //init data structures
     struct main_data *data = create_dynamic_memory(sizeof(struct main_data));
     struct communication_buffers *buffers = create_dynamic_memory(sizeof(struct communication_buffers));
-    struct semaphore *sems;
+    struct semaphores *sems;
 
     buffers->main_cli = create_dynamic_memory(sizeof(struct rnd_access_buffer));
 
@@ -149,7 +149,7 @@ void launch_processes(struct communication_buffers* buffers, struct main_data* d
     for (i = 0; i < data->n_clients; i++)
     {
         
-        data->client_pids[i]=launch_process(i, 0, buffers, data);
+        data->client_pids[i]=launch_process(i, 0, buffers, data, sems);
         
     }
 
@@ -157,7 +157,7 @@ void launch_processes(struct communication_buffers* buffers, struct main_data* d
     for (i = 0; i < data->n_proxies; i++)
     {
 
-        data->proxy_pids[i] = launch_process(i, 1, buffers, data);
+        data->proxy_pids[i] = launch_process(i, 1, buffers, data, sems);
         
     }
 
@@ -165,7 +165,7 @@ void launch_processes(struct communication_buffers* buffers, struct main_data* d
     for (i = 0; i < data->n_servers; i++)
     {
         
-        data->server_pids[i]=launch_process(i, 2, buffers, data);
+        data->server_pids[i]=launch_process(i, 2, buffers, data, sems);
         
     }
 }
@@ -252,7 +252,7 @@ void read_answer(struct main_data* data, struct semaphores* sems) {
     struct operation * opPtr = malloc(sizeof(struct operation));
 
     scanf(" %d", &read);
-
+    
     if (read >= data->max_ops || read < 0)
     {
         puts("op id provided is invalid!");

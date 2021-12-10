@@ -9,7 +9,7 @@
 
 
 /* Função principal de um Proxy. Deve executar um ciclo infinito onde em 
-* cada iteração do ciclo lê uma operação dos clientes e se a mesma tiver id 
+* cada iteração lê uma operação dos clientes e se a mesma tiver id 
 * diferente de -1 e se data->terminate ainda for igual a 0, processa-a e
 * escreve-a para os servidores. Operações com id igual a -1 são ignoradas
 * (op inválida) e se data->terminate for igual a 1 é porque foi dada ordem
@@ -17,7 +17,7 @@
 * operações processadas. Para efetuar estes passos, pode usar os outros
 * métodos auxiliares definidos em proxy.h.
 */
-int execute_proxy(int proxy_id, struct communication_buffers* buffers, struct main_data* data){
+int execute_proxy(int proxy_id, struct communication_buffers* buffers, struct main_data* data, struct semaphores* sems){
     struct operation op;
     struct operation *op_ptr = &op;
     
@@ -28,12 +28,12 @@ int execute_proxy(int proxy_id, struct communication_buffers* buffers, struct ma
             return *data->proxy_stats;
         }
         
-        proxy_receive_operation(op_ptr, buffers, data);
+        proxy_receive_operation(op_ptr, buffers, data, sems);
         if (op_ptr->id != -1 && *data->terminate == 0)
         {
             
             proxy_process_operation(op_ptr, proxy_id, data->proxy_stats);
-            proxy_forward_operation(op_ptr,buffers, data);
+            proxy_forward_operation(op_ptr,buffers, data, sems);
         }
 
         if (*data->terminate == 1)
@@ -47,11 +47,12 @@ int execute_proxy(int proxy_id, struct communication_buffers* buffers, struct ma
 
 
 /* Função que lê uma operação do buffer de memória partilhada entre
-* clientes e proxies. Antes de tentar ler a operação, deve verificar 
-* se data->terminate tem valor 1. Em caso afirmativo, retorna imediatamente 
-* da função.
+* clientes e proxies, efetuando a necessária sincronização antes e
+* depois de ler. Quando o processo acorda da sincronização, e antes de
+* tentar ler a operação, deve verificar se data->terminate tem valor 1.
+* Em caso afirmativo, retorna imediatamente da função.
 */
-void proxy_receive_operation(struct operation* op, struct communication_buffers* buffers, struct main_data* data){
+void proxy_receive_operation(struct operation* op, struct communication_buffers* buffers, struct main_data* data, struct semaphores* sems){
     if(*data->terminate == 1) {
         return;
     }
@@ -69,8 +70,9 @@ void proxy_process_operation(struct operation* op, int server_id, int* counter){
 
 
 /* Função que escreve uma operação no buffer de memória partilhada entre
-* proxies e servidores.
+* proxies e servidores, efetuando a necessária sincronização antes e
+* depois de escrever.
 */
-void proxy_forward_operation(struct operation* op, struct communication_buffers* buffers, struct main_data* data){
+void proxy_forward_operation(struct operation* op, struct communication_buffers* buffers, struct main_data* data, struct semaphores* sems){
     write_rnd_access_buffer(buffers->prx_srv, data->buffers_size, op);
 }

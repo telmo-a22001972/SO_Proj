@@ -13,14 +13,14 @@
 
 
 
-
 /* Função que inicia um processo através da função fork do SO. O novo
 * processo pode ser um cliente, proxy, ou servidor, consoante a variável
 * process_code tem valor 0, 1, ou 2 respectivamente, e irá executar a função
 * execute_* respetiva, fazendo exit do retorno. O processo pai devolve o pid
 * do processo criado.
 */
-int launch_process(int process_id, int process_code, struct communication_buffers* buffers, struct main_data* data){
+int launch_process(int process_id, int process_code, struct communication_buffers* buffers, struct main_data* data, struct semaphores* sems)
+{
     pid_t pid;
     int status;
     
@@ -32,17 +32,17 @@ int launch_process(int process_id, int process_code, struct communication_buffer
         if (process_code==0)
         {
             
-            status = execute_client(process_id,buffers,data);
+            status = execute_client(process_id,buffers,data, sems);
         }
         else if (process_code == 1)
         {
             
-            status = execute_proxy(process_id,buffers,data);
+            status = execute_proxy(process_id,buffers,data, sems);
         }
         else if(process_code == 2)
         {
             
-            status = execute_server(process_id,buffers,data);
+            status = execute_server(process_id,buffers,data, sems);
         }
     
         exit(status); 
