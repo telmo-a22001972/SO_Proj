@@ -15,6 +15,7 @@
 #include <sys/mman.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+#include <time.h>
 
 
 int main(int argc, char *argv[])
@@ -32,6 +33,7 @@ int main(int argc, char *argv[])
     buffers->prx_srv = create_dynamic_memory(sizeof(struct rnd_access_buffer));
 
     buffers->srv_cli = create_dynamic_memory(sizeof(struct circular_buffer));
+
 
     //execute main code
     main_args(argc, argv, data);

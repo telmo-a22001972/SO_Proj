@@ -13,7 +13,7 @@
 #include <sys/stat.h> 
 #include <fcntl.h> 
 #include <string.h>
-
+#include <time.h>
 
 /* Função que reserva uma zona de memória partilhada com tamanho indicado
 * por size e nome name, preenche essa zona de memória com o valor 0, e 
