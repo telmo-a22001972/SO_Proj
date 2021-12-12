@@ -5,6 +5,7 @@
 
 //fazer criar o ficheiro no main??
 void registerLog(struct main_data *data, int actionType, int readCounter){
+    
     FILE *ficheiro = fopen(data->log_filename, "a+");
     
 

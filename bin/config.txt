@@ -1,0 +1,6 @@
+max_ops 10
+buffers_size 10
+n_clients 1
+n_proxies 1
+n_servers 1
+log_filename log.txt

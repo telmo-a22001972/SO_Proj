@@ -17,14 +17,13 @@
 #include <fcntl.h>
 #include <time.h>
 #include "log.h"
-
+#include "configuration.h"
 
 int main(int argc, char *argv[])
 {
 
     //init data structures
     struct main_data *data = create_dynamic_memory(sizeof(struct main_data));
-    data->log_filename = "log.txt";
 
     struct communication_buffers *buffers = create_dynamic_memory(sizeof(struct communication_buffers));
     struct semaphores *sems;
@@ -37,10 +36,13 @@ int main(int argc, char *argv[])
 
     buffers->srv_cli = create_dynamic_memory(sizeof(struct circular_buffer));
 
+    data->log_filename = create_dynamic_memory(sizeof(char[20]));
 
-    //execute main code
+    //execute main codeS
     main_args(argc, argv, data);
+
     create_dynamic_memory_buffers(data);
+    
     create_shared_memory_buffers(data, buffers);
     
     launch_processes(buffers, data, sems);
@@ -59,19 +61,16 @@ int main(int argc, char *argv[])
 void main_args(int argc, char *argv[], struct main_data *data)
 {
 
-    if (argc != 6)
+    if (argc != 2)
     {
         printf("Modo de execução errado.\n");
-        puts("Exemplo: ./sovac 10 10 1 1 1");
+        puts("Exemplo: ./sovac config.txt");
         exit(1);
     }
     else
     {
-        data->max_ops = atoi(argv[1]);
-        data->buffers_size = atoi(argv[2]);
-        data->n_clients = atoi(argv[3]);
-        data->n_proxies = atoi(argv[4]);
-        data->n_servers = atoi(argv[5]);
+        readConfig(data, argv[1]);
+        
     }
 }
 
@@ -91,6 +90,7 @@ void create_dynamic_memory_buffers(struct main_data *data)
     data->client_stats = create_dynamic_memory(data->n_clients * sizeof(data->client_stats));
     data->proxy_stats = create_dynamic_memory(data->n_proxies * sizeof(data->proxy_stats));
     data->server_stats = create_dynamic_memory(data->n_servers * sizeof(data->server_stats));
+    
 }
 
 /* Função que reserva a memória partilhada necessária para a execução do
@@ -305,6 +305,7 @@ void stop_execution(struct main_data* data, struct communication_buffers* buffer
     destroy_dynamic_memory(buffers->prx_srv);
     destroy_dynamic_memory(buffers->srv_cli);
     destroy_dynamic_memory(buffers);
+    destroy_dynamic_memory(data->log_filename);
 }
 
 /* Função que acorda todos os processos adormecidos em semáforos, para que
@@ -379,6 +380,7 @@ void destroy_dynamic_memory_buffers(struct main_data *data)
     free(data->client_stats);
     free(data->proxy_stats);
     free(data->server_stats);
+    
 }
 
 /* Função que liberta todos os buffers de memória partilhada previamente
@@ -409,6 +411,8 @@ void destroy_shared_memory_buffers(struct main_data *data, struct communication_
     //Free no array results e no int terminate
     destroy_shared_memory("/data_results", data->results, data->max_ops * sizeof(data->results));
     destroy_shared_memory("/data_terminate", data->terminate, sizeof(int));
+
+    
 }
 
 /* Função que liberta todos os semáforos da estrutura semaphores.
