@@ -2,6 +2,7 @@
 #include <stdlib.h>
 
 #include "main.h"
+#include "configuration.h"
 #include <string.h>
 
 void readConfig(struct main_data *data, char file[20]){
@@ -13,43 +14,51 @@ void readConfig(struct main_data *data, char file[20]){
         exit(EXIT_FAILURE);
     }
     char line[100];
-    char op[100];
-    char num[100];
+    char * num = malloc(sizeof(line));
 
-    while(fgets(line, sizeof(line), ficheiro) != NULL)
+    func_ptr rotinaData[]= {{maxOps},{buffers_size},{n_clients},{n_proxies},{n_servers},{log_filename}};
+
+    
+
+    for(int i = 0; fgets(line, sizeof(line), ficheiro) != NULL ; i++)
     {
-        sscanf(line,"%s %s", op, num);
-                
-        if (strcmp(op, "max_ops") == 0)
-        {
-            data->max_ops = atoi(num);
-        } 
-        if (strcmp(op, "buffers_size") == 0)
-        {
-            data->buffers_size = atoi(num);
-        }
-        if (strcmp(op, "n_clients") == 0)
-        {
-            data->n_clients = atoi(num);
-        }
-        if (strcmp(op, "n_proxies") == 0)
-        {
-            data->n_proxies = atoi(num);
-        }
-        if (strcmp(op, "n_servers") == 0)
-        {
-            data->n_servers = atoi(num);
-        }
-        if (strcmp(op, "log_filename") == 0)
-        {
-            
-            strcpy(data->log_filename, num);
-            break;
-        }
-        
+      sscanf(line, " %s",num);
+      rotinaData[i].func(data,num);
     }
-    
     fclose(ficheiro);
-    
-    
+}
+
+
+
+//atribui o valor lido de configuração a max_ops
+void maxOps (struct main_data *data ,char * num)
+{
+  data->max_ops = atoi(num);
+}
+//atribui o valor lido de configuração a buffers_size
+void buffers_size (struct main_data *data , char * num)
+{
+  data->buffers_size = atoi(num);
+}
+//atribui o valor lido de configuração a n_clients
+void n_clients (struct main_data *data , char * num)
+{
+  data->n_clients = atoi(num);
+}
+//atribui o valor lido de configuração a n_proxies
+void n_proxies (struct main_data *data , char * num)
+{
+  data->n_proxies = atoi(num);
+}
+//atribui o valor lido de configuração a n_servers
+void n_servers (struct main_data *data , char * num)
+{
+  data->n_servers = atoi(num);
+}
+//atribui o valor lido de configuração a log_filename
+void log_filename (struct main_data *data , char * num)
+{
+  data->log_filename = malloc(sizeof(num));
+  strcpy(data->log_filename, num);
+  free(num);
 }
