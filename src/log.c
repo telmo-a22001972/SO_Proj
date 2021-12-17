@@ -2,37 +2,50 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "main.h"
+#include "log.h"
 
-//fazer criar o ficheiro no main??
+
 void registerLog(struct main_data *data, int actionType, int readCounter){
     
     FILE *ficheiro = fopen(data->log_filename, "a+");
     
+    struct timespec spec;
 
     if (ficheiro == NULL)
     {
         puts("Error opening file");
         exit(EXIT_FAILURE);
     }
+    else if ( clock_gettime(CLOCK_REALTIME, &spec) == -1)
+    {
+        perror("clock gettime");
+        exit(EXIT_FAILURE);
+    }
 
-    time_t rawtime;
-    struct tm *info;
-    time( &rawtime );
-    info = localtime( &rawtime );
+    time_t s = spec.tv_sec;
+    long ms = (spec.tv_nsec / 1.0e6); //nano para mili
+    if (ms>999)
+    {
+        s++;
+        ms=0;
+    }
+    
+    char timeToString[80];
+    struct tm *infoTime;
+    infoTime = localtime(&s);
+    strftime(timeToString,sizeof(timeToString),"%Y-%m-%d %H:%M:%S", infoTime);
 
     switch (actionType)
     {
     case 0: //op
-
-        fprintf(ficheiro, "%d-%d-%d %d:%d:%d op\n", info->tm_year+1900, info->tm_mon+1, info->tm_mday, info->tm_hour,info->tm_min,info->tm_sec);
-        
+        fprintf(ficheiro,"%s.%03ld op\n",timeToString,ms);
         break;
     case 1:
-        fprintf(ficheiro, "%d-%d-%d %d:%d:%d read %d\n", info->tm_year+1900, info->tm_mon+1, info->tm_mday, info->tm_hour,info->tm_min,info->tm_sec, readCounter);
+        fprintf(ficheiro,"%s.%03ld read %d\n",timeToString,ms,readCounter);
         break;
     
     case 2:
-        fprintf(ficheiro, "%d-%d-%d %d:%d:%d stop\n", info->tm_year+1900, info->tm_mon+1, info->tm_mday, info->tm_hour,info->tm_min,info->tm_sec);
+        fprintf(ficheiro,"%s.%03ld stop\n",timeToString,ms);
         break;
 
     default:

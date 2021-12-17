@@ -83,13 +83,27 @@ void create_dynamic_memory_buffers(struct main_data *data)
 {
     //Alocar memória para cada array de pids da data, do tamanho n_clientes, n_proxies, n_servers
     data->client_pids = create_dynamic_memory(data->n_clients * sizeof(data->client_pids));
+    
     data->proxy_pids = create_dynamic_memory(data->n_proxies * sizeof(data->proxy_pids));
     data->server_pids = create_dynamic_memory(data->n_servers * sizeof(data->server_pids));
 
     //Alocar memória para cada array de status da ta, do tamanho n_clientes, n_proxies, n_servers
     data->client_stats = create_dynamic_memory(data->n_clients * sizeof(data->client_stats));
+    for (int i = 0; i < data->n_clients ; i++)
+    {
+        data->client_stats[i] = 0;
+    }
+    
     data->proxy_stats = create_dynamic_memory(data->n_proxies * sizeof(data->proxy_stats));
+    for (int i = 0; i < data->n_proxies; i++)
+    {
+        data->proxy_stats[i] = 0;
+    }
     data->server_stats = create_dynamic_memory(data->n_servers * sizeof(data->server_stats));
+    for (int i = 0; i < data->n_servers; i++)
+    {
+        data->server_stats[i] = 0;
+    }
     
 }
 
@@ -261,7 +275,7 @@ void read_answer(struct main_data* data, struct semaphores* sems) {
     struct operation * opPtr = malloc(sizeof(struct operation));
 
     scanf(" %d", &read);
-    registerLog(data, 1, read);
+    
     if (read >= data->max_ops || read < 0)
     {
         puts("op id provided is invalid!");
@@ -271,6 +285,8 @@ void read_answer(struct main_data* data, struct semaphores* sems) {
         *opPtr = data->results[read];
         if (opPtr->status == 'S')
         {
+            //registar opcao no log
+            registerLog(data, 1, read);
             printf("op %d with status %c was received by client %d, forwarded by proxy %d, and served by server %d\n", opPtr->id , opPtr->status , opPtr->client, opPtr->proxy , opPtr->server);
         }
         else {
