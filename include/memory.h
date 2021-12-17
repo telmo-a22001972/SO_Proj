@@ -24,11 +24,11 @@ struct operation {
 	int client;							//id do cliente que a recebeu
 	int proxy; 							//id do proxy que a encaminhou
 	int server;							//id do server que a serviu
-	struct timespec start_time;			//quando a op foi iniciada
-	struct timespec client_time;		//quando o client processou a op
-	struct timespec proxy_time;			//quando o proxy processou a op
-	struct timespec server_time;		//quando o server processou a op
-	struct timespec end_time;			//quando a op foi concluida
+	struct timespec *start_time;			//quando a op foi iniciada
+	struct timespec *client_time;		//quando o client processou a op
+	struct timespec *proxy_time;			//quando o proxy processou a op
+	struct timespec *server_time;		//quando o server processou a op
+	struct timespec *end_time;			//quando a op foi concluida
 	
 };
 

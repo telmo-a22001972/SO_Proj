@@ -1,5 +1,14 @@
 #include <stdio.h>
+#include <fcntl.h>
+#include <time.h>
 #include <stdlib.h>
+#include <sys/types.h>
+#include <unistd.h>
+#include <string.h>
+#include <sys/wait.h>
+#include <sys/mman.h>
+#include <sys/stat.h>
+#include <signal.h>
 #include "client.h"
 #include "main.h"
 #include "memory-private.h"
@@ -7,26 +16,30 @@
 #include "process.h"
 #include "proxy.h"
 #include "server.h"
+#include "sotime.h"
 #include "synchronization.h"
-#include <sys/types.h>
-#include <unistd.h>
-#include <string.h>
-#include <sys/wait.h>
-#include <sys/mman.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <time.h>
+
+
 #include "log.h"
 #include "configuration.h"
+
+struct main_data *data;
+struct communication_buffers *buffers;
+struct semaphores *sems;
+
+void ctrlC() {
+    stop_execution(data,buffers,sems);
+    exit(0);
+}
+
 
 int main(int argc, char *argv[])
 {
 
     //init data structures
-    struct main_data *data = create_dynamic_memory(sizeof(struct main_data));
+    data = create_dynamic_memory(sizeof(struct main_data));
 
-    struct communication_buffers *buffers = create_dynamic_memory(sizeof(struct communication_buffers));
-    struct semaphores *sems;
+    buffers = create_dynamic_memory(sizeof(struct communication_buffers));
 
     buffers->main_cli = create_dynamic_memory(sizeof(struct rnd_access_buffer));
 
@@ -39,6 +52,7 @@ int main(int argc, char *argv[])
     data->log_filename = create_dynamic_memory(sizeof(char[20]));
 
     //execute main codeS
+    
     main_args(argc, argv, data);
 
     create_dynamic_memory_buffers(data);
@@ -46,6 +60,7 @@ int main(int argc, char *argv[])
     create_shared_memory_buffers(data, buffers);
     
     launch_processes(buffers, data, sems);
+    signal(SIGINT, ctrlC);
     
     
     user_interaction(buffers, data, sems);
@@ -251,7 +266,8 @@ void create_request(int* op_counter, struct communication_buffers* buffers, stru
     }else{
         
         struct operation *op_ptr;
-
+        //clock op init
+        clock_start_time(op_ptr);
         op_ptr->id = *op_counter;
         
         write_rnd_access_buffer(buffers->main_cli, data->buffers_size, op_ptr);

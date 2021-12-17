@@ -6,6 +6,7 @@
 #include "process.h"
 #include "proxy.h"
 #include "server.h"
+#include "sotime.h"
 #include <stdlib.h>
 #include <unistd.h> 
 #include <sys/wait.h> 

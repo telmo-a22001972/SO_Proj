@@ -6,6 +6,7 @@
 #include "process.h"
 #include "proxy.h"
 #include "server.h"
+#include "sotime.h"
 
 
 /* Função principal de um Servidor. Deve executar um ciclo infinito onde em 
@@ -65,6 +66,8 @@ void server_process_operation(struct operation* op, int server_id, int* counter)
     op->server = server_id;
     op->status = 'S';
     *counter+=1;
+    //clock client processou a op
+    clock_server_time(op);
 }
 
 /* Função que escreve uma operação no buffer de memória partilhada entre

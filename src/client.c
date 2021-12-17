@@ -6,6 +6,7 @@
 #include "process.h"
 #include "proxy.h"
 #include "server.h"
+#include "sotime.h"
 
 /* Função principal de um Cliente. Deve executar um ciclo infinito
 * onde em cada iteração tem dois passos: primeiro, lê uma operação
@@ -70,6 +71,7 @@ void client_get_operation(struct operation* op, struct communication_buffers* bu
     }
     else {
         read_rnd_access_buffer(buffers->main_cli, data->buffers_size, op);
+        
     }
     
 }
@@ -84,6 +86,8 @@ void client_process_operation(struct operation* op, int cient_id, int* counter){
     op->client = cient_id;
     op->status = 'C';
     *counter +=1;
+    //clock client processou a op
+    clock_client_time(op);
 }
 
 
@@ -119,7 +123,18 @@ void client_receive_answer(struct operation* op, struct communication_buffers* b
 * terminou.
 */
 void client_process_answer(struct operation* op, struct main_data* data, struct semaphores* sems){
+    fflush(stdout);
+    fflush(stdin);
     data->results[op->id] = *op;
-    printf("Operation %d is ready to be read!\n", op->id);
+    //clock client recebeu op do server
+    clock_end_time(op);
+    unsigned int time = (op->end_time->tv_sec - op->start_time->tv_sec) + (op->end_time->tv_nsec - op->start_time->tv_nsec) / 1000000000L;
+    unsigned int before_ns = (op->start_time->tv_sec * 1000000000) + op->start_time->tv_nsec;
+    unsigned int after_ns = (op->end_time->tv_sec * 1000000000) + op->end_time->tv_nsec;
+    unsigned int tempo = (after_ns - before_ns) / 1.0e6;
+    printf("Operation %d is ready to be read! It took %d millisecs\n", op->id,tempo);
+    
+    
+    
 
 }

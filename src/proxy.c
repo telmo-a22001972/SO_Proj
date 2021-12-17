@@ -6,6 +6,7 @@
 #include "process.h"
 #include "proxy.h"
 #include "server.h"
+#include "sotime.h"
 
 
 /* Função principal de um Proxy. Deve executar um ciclo infinito onde em 
@@ -66,6 +67,8 @@ void proxy_process_operation(struct operation* op, int server_id, int* counter){
     op->proxy = server_id;
     op->status = 'P';
     *counter+=1;
+    //clock proxy processou a op
+    clock_proxy_time(op);
 }
 
 
