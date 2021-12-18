@@ -294,14 +294,14 @@ void user_interaction(struct communication_buffers* buffers, struct main_data* d
 
 void create_request(int* op_counter, struct communication_buffers* buffers, struct main_data* data, struct semaphores* sems){
     
-    registerLog(data, 0, 0);
+    
     
     if (*op_counter >= data->max_ops)
     {
         puts("max ops has been reached!");
         return;
     }else{
-        
+        registerLog(data, 0, 0);
         struct operation *op_ptr;
         //clock op init
         clock_start_time(op_ptr);
