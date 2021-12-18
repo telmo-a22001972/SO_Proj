@@ -5,6 +5,6 @@
 - Pedro Moreira | a22002701
 ---
 **Modo de execução**
-$./sovac max_ops buffers_size n_clients n_proxies n_servers
+$./sovac config.txt
 --- 
 
