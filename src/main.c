@@ -41,6 +41,8 @@ int main(int argc, char *argv[])
 
     buffers = create_dynamic_memory(sizeof(struct communication_buffers));
 
+    sems = create_dynamic_memory(sizeof(struct semaphores));
+
     buffers->main_cli = create_dynamic_memory(sizeof(struct rnd_access_buffer));
 
     buffers->cli_prx = create_dynamic_memory(sizeof(struct circular_buffer));
@@ -48,18 +50,35 @@ int main(int argc, char *argv[])
     buffers->prx_srv = create_dynamic_memory(sizeof(struct rnd_access_buffer));
 
     buffers->srv_cli = create_dynamic_memory(sizeof(struct circular_buffer));
+    
+    sems->main_cli = create_dynamic_memory(sizeof(struct prodcons));
+    
+    sems->cli_prx = create_dynamic_memory(sizeof(struct prodcons));
+    
+    sems->prx_srv = create_dynamic_memory(sizeof(struct prodcons));
+    
+    sems->srv_cli = create_dynamic_memory(sizeof(struct prodcons));
 
     data->log_filename = create_dynamic_memory(sizeof(char[20]));
 
-    //execute main codeS
+    //criacao de semaforos
+    
+    
+    
+    
+    
+    //execute main codeS        
     
     main_args(argc, argv, data);
 
     create_dynamic_memory_buffers(data);
     
     create_shared_memory_buffers(data, buffers);
+
+    create_semaphores(data, sems);
     
     launch_processes(buffers, data, sems);
+    
     signal(SIGINT, ctrlC);
     
     
@@ -167,6 +186,23 @@ void create_shared_memory_buffers(struct main_data *data, struct communication_b
 */
 void create_semaphores(struct main_data* data, struct semaphores* sems)
 {
+    
+    sems->main_cli->full = semaphore_create("/sem_main_cli_full", 0);
+    sems->main_cli->empty = semaphore_create( "/sem_main_cli_empty", data->buffers_size);
+    sems->main_cli->mutex = semaphore_create( "/sem_main_cli_mutex", 1);
+    
+    sems->cli_prx->full = semaphore_create( "/sem_cli_prx_full", 0);
+    sems->cli_prx->empty = semaphore_create( "/sem_cli_prx_empty", data->buffers_size);
+    sems->cli_prx->mutex = semaphore_create( "/sem_cli_prx_mutex", 1);
+ 
+    sems->prx_srv->full = semaphore_create( "/sem_prx_srv_full", 0);
+    sems->prx_srv->empty = semaphore_create( "/sem_prx_srv_empty", data->buffers_size);
+    sems->prx_srv->mutex = semaphore_create( "/sem_prx_srv_mutex", 1);
+    
+    sems->srv_cli->full = semaphore_create( "/sem_srv_cli_full", 0);
+    sems->srv_cli->empty = semaphore_create( "/sem_srv_cli_empty", data->buffers_size);
+    sems->srv_cli->mutex = semaphore_create( "/sem_srv_cli_mutex", 1);
+   
 }
 
 /* Função que inicia os processos dos clientes, proxies e
@@ -224,6 +260,7 @@ void user_interaction(struct communication_buffers* buffers, struct main_data* d
         if (strcmp(menuOp, "op") == 0)
         {
             /*criar operacao*/
+            
             create_request(op_counter_ptr, buffers, data, sems);
         }
         else if (strcmp(menuOp, "read") == 0)
@@ -269,8 +306,9 @@ void create_request(int* op_counter, struct communication_buffers* buffers, stru
         //clock op init
         clock_start_time(op_ptr);
         op_ptr->id = *op_counter;
-        
+        produce_begin(sems->main_cli);
         write_rnd_access_buffer(buffers->main_cli, data->buffers_size, op_ptr);
+        produce_end(sems->main_cli);
         printf("operation %d created!\n", *op_counter);
 
         *op_counter+=1;
@@ -322,10 +360,12 @@ void read_answer(struct main_data* data, struct semaphores* sems) {
 *reservadas. Para tal, pode usar as outras funções auxiliares do main.h.
 */
 void stop_execution(struct main_data* data, struct communication_buffers* buffers, struct semaphores* sems) {
+    
     *data->terminate = 1;
-
+    wakeup_processes(data, sems);
+    
     wait_processes(data);
-
+    destroy_semaphores(sems);
     write_statistics(data);
 
     /*destruir memória*/
@@ -346,7 +386,33 @@ void stop_execution(struct main_data* data, struct communication_buffers* buffer
 * onde possam estar processos adormecidos e um número de vezes igual ao 
 * máximo de processos que possam lá estar.
 */
-void wakeup_processes(struct main_data* data, struct semaphores* sems){}
+void wakeup_processes(struct main_data* data, struct semaphores* sems){
+    int num_processos;
+    if (data->n_clients>=data->n_proxies && data->n_clients>=data->n_servers)
+    {
+        num_processos = data->n_clients;
+
+    } else if (data->n_proxies >= data->n_servers && data->n_proxies >= data->n_clients)
+    {
+        num_processos = data->n_proxies;
+
+    } else
+    {
+        num_processos = data->n_servers;
+    }
+    
+    for (int i = 0; i < num_processos; i++)
+    {
+        produce_end(sems->main_cli);
+        produce_end(sems->cli_prx);
+        produce_end(sems->prx_srv);
+        produce_end(sems->srv_cli);
+        
+    }
+
+    
+    
+}
 
 
 /* Função que espera que todos os processos previamente iniciados terminem,
@@ -449,4 +515,22 @@ void destroy_shared_memory_buffers(struct main_data *data, struct communication_
 
 /* Função que liberta todos os semáforos da estrutura semaphores.
 */
-void destroy_semaphores(struct semaphores* sems){}
+void destroy_semaphores(struct semaphores* sems){
+    semaphore_destroy("/sem_main_cli_full", sems->main_cli->full);
+    semaphore_destroy("/sem_main_cli_empty",sems->main_cli->empty);
+    semaphore_destroy("/sem_main_cli_mutex",sems->main_cli->mutex);
+
+    semaphore_destroy("/sem_cli_prx_full",sems->cli_prx->full);
+    semaphore_destroy("/sem_cli_prx_empty",sems->cli_prx->empty);
+    semaphore_destroy("/sem_cli_prx_mutex",sems->cli_prx->mutex);
+
+    semaphore_destroy("/sem_prx_srv_full",sems->prx_srv->full);
+    semaphore_destroy("/sem_prx_srv_empty",sems->prx_srv->empty);
+    semaphore_destroy("/sem_prx_srv_mutex",sems->prx_srv->mutex);
+ 
+    semaphore_destroy("/sem_srv_cli_full",sems->srv_cli->full);
+    semaphore_destroy("/sem_srv_cli_empty",sems->srv_cli->empty);
+    semaphore_destroy("/sem_srv_cli_mutex",sems->srv_cli->mutex);
+    
+    //semaphore_destroy("/sem_results_mutex",sems);
+}

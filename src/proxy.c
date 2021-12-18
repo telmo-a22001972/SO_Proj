@@ -29,12 +29,18 @@ int execute_proxy(int proxy_id, struct communication_buffers* buffers, struct ma
             return *data->proxy_stats;
         }
         
+        consume_begin(sems->cli_prx);
         proxy_receive_operation(op_ptr, buffers, data, sems);
+        consume_end(sems->cli_prx);
+        
         if (op_ptr->id != -1 && *data->terminate == 0)
         {
             
             proxy_process_operation(op_ptr, proxy_id, data->proxy_stats);
+
+            produce_end(sems->prx_srv);
             proxy_forward_operation(op_ptr,buffers, data, sems);
+            produce_end(sems->prx_srv);
         }
 
         if (*data->terminate == 1)

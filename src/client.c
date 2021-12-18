@@ -29,18 +29,33 @@ int execute_client(int client_id, struct communication_buffers* buffers, struct 
         {
             return *data->client_stats;
         }
-        
+        //Processo de consumir
+        //sem_wait(full)
+        //sem_wait(mutex)
+        consume_begin(sems->main_cli);
         client_get_operation(op_ptr, buffers, data, sems);
+        consume_end(sems->main_cli);
+        //sem_post(mutex)
+        //sem_post(empty)
 
         if (op_ptr->id != -1 && *data->terminate == 0)
         {
             
             client_process_operation(op_ptr, client_id, data->client_stats);
+            //Processo de produzir
+            //sem_wait(empty)
+            //sem_wait(mutex)
+            produce_begin(sems->cli_prx);
             client_send_operation(op_ptr, buffers, data, sems);
+            produce_end(sems->cli_prx);
+            //sem_post(mutex)
+            //sem_post(full)
         }
         
-
+        consume_begin(sems->srv_cli);
         client_receive_answer(op_ptr, buffers, data, sems);
+        consume_end(sems->srv_cli);
+
         if (op_ptr->id != -1 && *data->terminate == 0)
         {
             client_process_answer(op_ptr,data, sems);

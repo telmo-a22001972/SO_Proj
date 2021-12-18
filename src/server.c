@@ -29,11 +29,16 @@ int execute_server(int server_id, struct communication_buffers* buffers, struct 
             return *data->server_stats;
         }
         
+        consume_begin(sems->prx_srv);
         server_receive_operation(op_ptr,buffers,data, sems);
+        consume_end(sems->prx_srv);
+
         if (op_ptr->id != -1 && *data->terminate == 0)
         {
             server_process_operation(op_ptr, server_id, data->server_stats);
+            produce_begin(sems->srv_cli);
             server_send_answer(op_ptr,buffers, data, sems);
+            produce_end(sems->srv_cli);
         }
 
         if (*data->terminate == 1)
