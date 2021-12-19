@@ -14,4 +14,6 @@ nota: o ficheiro tem de estar na mesma pasta que o executável.
 ```
 --- 
 **Observações**
+```
 Implementação completa e funcional, de acordo com o enunciado.
+```
