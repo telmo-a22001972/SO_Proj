@@ -7,7 +7,9 @@
 **Modo de execução**
 $./sovac config.txt
 sendo config.txt o ficheiro de configuração.
-**nota**: o ficheiro tem de estar na mesma pasta que o executável.
+```
+nota: o ficheiro tem de estar na mesma pasta que o executável.
+```
 --- 
 **Observações**
 Implementação completa e funcional, de acordo com o enunciado.
