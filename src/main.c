@@ -28,14 +28,16 @@ struct communication_buffers *buffers;
 struct semaphores *sems;
 
 void ctrlC() {
-    stop_execution(data,buffers,sems);
-    exit(0);
+
+   stop_execution(data,buffers,sems);
+
+   exit(0);
 }
 
 
 int main(int argc, char *argv[])
 {
-
+    
     //init data structures
     data = create_dynamic_memory(sizeof(struct main_data));
 
@@ -61,8 +63,8 @@ int main(int argc, char *argv[])
 
     data->log_filename = create_dynamic_memory(sizeof(char[20]));
 
-    //criacao de semaforos
     
+    signal(SIGINT, ctrlC);
     
     
     
@@ -74,13 +76,10 @@ int main(int argc, char *argv[])
     create_dynamic_memory_buffers(data);
     
     create_shared_memory_buffers(data, buffers);
-
+//criacao de semaforos
     create_semaphores(data, sems);
     
     launch_processes(buffers, data, sems);
-    
-    signal(SIGINT, ctrlC);
-    
     
     user_interaction(buffers, data, sems);
     
@@ -202,6 +201,8 @@ void create_semaphores(struct main_data* data, struct semaphores* sems)
     sems->srv_cli->full = semaphore_create( "/sem_srv_cli_full", 0);
     sems->srv_cli->empty = semaphore_create( "/sem_srv_cli_empty", data->buffers_size);
     sems->srv_cli->mutex = semaphore_create( "/sem_srv_cli_mutex", 1);
+
+    sems->results_mutex = semaphore_create("/sem_results_mutex",1);
    
 }
 
@@ -333,7 +334,6 @@ void read_answer(struct main_data* data, struct semaphores* sems) {
     if (read >= data->max_ops || read < 0)
     {
         puts("op id provided is invalid!");
-        return;
     }
     else{
         *opPtr = data->results[read];
@@ -365,10 +365,12 @@ void stop_execution(struct main_data* data, struct communication_buffers* buffer
     wakeup_processes(data, sems);
     
     wait_processes(data);
+    
     destroy_semaphores(sems);
     write_statistics(data);
 
     /*destruir memória*/
+    
     destroy_shared_memory_buffers(data, buffers);
     destroy_dynamic_memory_buffers(data);
     destroy_dynamic_memory(data);
@@ -447,6 +449,7 @@ void wait_processes(struct main_data *data) {
 */
 void write_statistics(struct main_data *data) {
     int i;
+    printf("\n");
     for (i = 0; i < data->n_clients; i++)
     {   
         printf("O client %d processou %d operações\n", i, data->client_stats[i]);
@@ -531,6 +534,13 @@ void destroy_semaphores(struct semaphores* sems){
     semaphore_destroy("/sem_srv_cli_full",sems->srv_cli->full);
     semaphore_destroy("/sem_srv_cli_empty",sems->srv_cli->empty);
     semaphore_destroy("/sem_srv_cli_mutex",sems->srv_cli->mutex);
+
+    semaphore_destroy("/sem_results_mutex" , sems->results_mutex);
+    
+    destroy_dynamic_memory(sems->main_cli);
+    destroy_dynamic_memory(sems->cli_prx);
+    destroy_dynamic_memory(sems->prx_srv);
+    destroy_dynamic_memory(sems->srv_cli);
     
     //semaphore_destroy("/sem_results_mutex",sems);
 }

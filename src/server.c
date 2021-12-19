@@ -7,6 +7,7 @@
 #include "proxy.h"
 #include "server.h"
 #include "sotime.h"
+#include <signal.h>
 
 
 /* Função principal de um Servidor. Deve executar um ciclo infinito onde em 
@@ -21,7 +22,7 @@
 int execute_server(int server_id, struct communication_buffers* buffers, struct main_data* data, struct semaphores* sems){
     struct operation op;
     struct operation *op_ptr = &op;
-
+    signal(SIGINT,SIG_IGN);
     while (1)
     {
         if (*data->terminate == 1)

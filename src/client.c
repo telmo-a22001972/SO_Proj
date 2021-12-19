@@ -7,6 +7,7 @@
 #include "proxy.h"
 #include "server.h"
 #include "sotime.h"
+#include <signal.h>
 
 /* Função principal de um Cliente. Deve executar um ciclo infinito
 * onde em cada iteração tem dois passos: primeiro, lê uma operação
@@ -22,34 +23,27 @@
 int execute_client(int client_id, struct communication_buffers* buffers, struct main_data* data, struct semaphores* sems){
     struct operation op;
     struct operation *op_ptr = &op;
-
+    signal(SIGINT,SIG_IGN);
     while (1)
     {   
         if (*data->terminate == 1)
         {
             return *data->client_stats;
         }
-        //Processo de consumir
-        //sem_wait(full)
-        //sem_wait(mutex)
+        
         consume_begin(sems->main_cli);
         client_get_operation(op_ptr, buffers, data, sems);
         consume_end(sems->main_cli);
-        //sem_post(mutex)
-        //sem_post(empty)
 
         if (op_ptr->id != -1 && *data->terminate == 0)
         {
             
             client_process_operation(op_ptr, client_id, data->client_stats);
-            //Processo de produzir
-            //sem_wait(empty)
-            //sem_wait(mutex)
+
             produce_begin(sems->cli_prx);
             client_send_operation(op_ptr, buffers, data, sems);
             produce_end(sems->cli_prx);
-            //sem_post(mutex)
-            //sem_post(full)
+
         }
         
         consume_begin(sems->srv_cli);
@@ -59,6 +53,7 @@ int execute_client(int client_id, struct communication_buffers* buffers, struct 
         if (op_ptr->id != -1 && *data->terminate == 0)
         {
             client_process_answer(op_ptr,data, sems);
+
         }
         
         if (*data->terminate == 1)
@@ -138,18 +133,29 @@ void client_receive_answer(struct operation* op, struct communication_buffers* b
 * terminou.
 */
 void client_process_answer(struct operation* op, struct main_data* data, struct semaphores* sems){
-    fflush(stdout);
-    fflush(stdin);
+    
+    semaphore_mutex_lock(sems->results_mutex);
     data->results[op->id] = *op;
+    semaphore_mutex_unlock(sems->results_mutex);
+
     //clock client recebeu op do server
     clock_end_time(op);
-    unsigned int time = (op->end_time->tv_sec - op->start_time->tv_sec) + (op->end_time->tv_nsec - op->start_time->tv_nsec) / 1000000000L;
     unsigned int before_ns = (op->start_time->tv_sec * 1000000000) + op->start_time->tv_nsec;
     unsigned int after_ns = (op->end_time->tv_sec * 1000000000) + op->end_time->tv_nsec;
-    unsigned int tempo = (after_ns - before_ns) / 1.0e6;
-    printf("Operation %d is ready to be read! It took %d millisecs\n", op->id,tempo);
+
+    unsigned int tempoTotal = (after_ns - before_ns) / 1.0e6;
     
+    /*unsigned int after_client_ns = (op->client_time->tv_sec * 1000000000) + op->client_time->tv_nsec;
+    unsigned int after_prxy_ns = (op->proxy_time->tv_sec * 1000000000) + op->proxy_time->tv_nsec;
+    unsigned int after_server_ns = (op->server_time->tv_sec * 1000000000) + op->server_time->tv_nsec;*/
+    /*unsigned int tempoClient = (after_client_ns - before_ns) / 1.0e6;
+    unsigned int tempoProxy = (after_prxy_ns - before_ns) / 1.0e6;
+    unsigned int tempoServer = (after_server_ns - before_ns) / 1.0e6;*/
     
-    
+
+    printf("Operation %d is ready to be read! It took %d millisecs\n", op->id,tempoTotal);
+    /*printf("Was read by Client %d ms after\n",tempoClient);
+    printf("Was read by Proxy %d ms after\n",tempoProxy);
+    printf("Was read by Server %d ms after\n",tempoServer);*/
 
 }
