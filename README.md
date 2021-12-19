@@ -1,4 +1,4 @@
-# Projeto parte 1 SO
+# Projeto Fase 2 SO
 ##### Grupo SO17
 - Telmo Panaças | a22001972
 - Bernardo Baltazar | a21704025
