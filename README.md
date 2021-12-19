@@ -4,6 +4,7 @@
 - Bernardo Baltazar | a21704025
 - Pedro Moreira | a22002701
 ---
+## Sovac
 **Modo de execução**
 ```
  $./sovac config.txt
